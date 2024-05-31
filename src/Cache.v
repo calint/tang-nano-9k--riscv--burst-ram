@@ -52,8 +52,8 @@ module Cache #(
   ICache #(
       .LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
       .ADDRESS_BITWIDTH(ADDRESS_BITWIDTH),
-      .INSTRUCTION_BITWIDTH(32),  // 4 B per instruction
-      .INSTRUCTION_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),  // 2^3 32 bit instructions per cache line (32B)
+      .DATA_BITWIDTH(32),  // 4 B per instruction
+      .DATA_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),  // 2^3 32 bit instructions per cache line (32B)
       .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
       .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH),
       .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT)  // 4 * 64 bits = 32B
@@ -64,7 +64,7 @@ module Cache #(
       .rst(rst),
       .enable(icache_enable),
       .address(addrB),
-      .instruction(doutB),
+      .data(doutB),
       .data_ready(rdyB),
       .busy(bsyB),
 

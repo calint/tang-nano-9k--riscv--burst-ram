@@ -27,8 +27,8 @@ module TestBench;
   ICache #(
       .LINE_IX_BITWIDTH(1),  // 2^1 cache lines
       .ADDRESS_BITWIDTH(32),
-      .INSTRUCTION_BITWIDTH(32), // 4 B per instruction
-      .INSTRUCTION_IX_IN_LINE_BITWIDTH(3),  // 2^3 32 bit instructions per cache line (32B)
+      .DATA_BITWIDTH(32), // 4 B per instruction
+      .DATA_IX_IN_LINE_BITWIDTH(3),  // 2^3 32 bit instructions per cache line (32B)
       .RAM_DEPTH_BITWIDTH(4),
       .RAM_BURST_DATA_BITWIDTH(64),
       .RAM_BURST_DATA_COUNT(4)  // 4 * 64 bits = 32B
@@ -39,7 +39,7 @@ module TestBench;
       .rst(rst),
       .enable(enable),
       .address(address),
-      .instruction(instruction),
+      .data(instruction),
       .data_ready(data_ready),
       .busy(busy),
 
