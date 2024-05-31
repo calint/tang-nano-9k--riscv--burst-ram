@@ -27,7 +27,7 @@ module Cache #(
     //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * INSTRUCTION_BITWIDTH / 8 =
     //       32 B
 ) (
-    input wire clk,
+    input wire clk_cpu,
     input wire clk_ram,
     input wire rst,
     input wire [NUM_COL-1:0] weA,
@@ -96,14 +96,14 @@ module Cache #(
 
   reg [3:0] state_port_b;
 
-  always @(posedge clk) begin
+  always @(posedge clk_cpu) begin
     if (rst) begin
       state_port_b <= STATE_PORT_B_IDLE;
     end
   end
 
   // Port-A Operation
-  always @(posedge clk) begin
+  always @(posedge clk_cpu) begin
     for (integer i = 0; i < NUM_COL; i = i + 1) begin
       if (weA[i]) begin
         data[addrA][i*COL_WIDTH+:COL_WIDTH] <= dinA[i*COL_WIDTH+:COL_WIDTH];
@@ -113,7 +113,7 @@ module Cache #(
   end
 
   // Port-B Operation:
-  always @(posedge clk) begin
+  always @(posedge clk_cpu) begin
     if (!rst) begin
 
 `ifdef DBG

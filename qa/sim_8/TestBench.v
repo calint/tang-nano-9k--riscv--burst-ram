@@ -46,7 +46,7 @@ module TestBench;
       //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * INSTRUCTION_BITWIDTH / 8 =
       //       32 B
   ) cache (
-      .clk(clk),
+      .clk_cpu(clk),
       .clk_ram(clk_ram),
       .rst(rst),
       .weA(weA),
