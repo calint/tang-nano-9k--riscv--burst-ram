@@ -12,21 +12,21 @@ module Cache #(
     // 2 ^ 32 addressable bytes
 
     parameter INSTRUCTION_BITWIDTH = 32,
-    // size of an instruction must be divisble by 8
-    
+    // size of an instruction; must be divisble by 8
+
     parameter CACHE_LINE_IX_BITWIDTH = 1,
     // 2 ^ 1 = 2 cache lines x 32 B
-    
+
     parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
     // 2 ^ 3 = 8 instructions per cache line
-    
+
     parameter RAM_DEPTH_BITWIDTH = 4,
     // 2 ^ 4 = 16 RAM entries of size RAM_BURST_DATA_BITWIDTH
     // same as specified to BurstRAM
-    
+
     parameter RAM_BURST_DATA_COUNT = 4,
     // how many consequitive data is retrieved by BurstRAM
-    
+
     parameter RAM_BURST_DATA_BITWIDTH = 64
     // size of data sent in bits, must be divisible by 8 into bytes
     // RAM reads 4 * 8 = 32 B per burst
@@ -61,13 +61,11 @@ module Cache #(
   ICache #(
       .ADDRESS_BITWIDTH(ADDRESS_BITWIDTH),
       .LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
-      .DATA_BITWIDTH(32),  // 4 B per instruction
-      .DATA_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),  // 2^3 32 bit instructions per cache line (32B)
+      .DATA_BITWIDTH(32),
+      .DATA_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),
       .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
       .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH),
-      .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT)  // 4 * 64 bits = 32B
-      // note: size of INSTRUCTION_IX_IN_LINE_BITWIDTH and RAM_READ_BURST_COUNT must
-      //       result in same number of bytes because a cache line is loaded by the size of a burst
+      .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT)
   ) icache (
       .clk(clk),
       .rst(rst),
@@ -131,15 +129,15 @@ module Cache #(
           if (bsyB) begin
             state_port_b <= STATE_PORT_B_WAIT_ICACHE_BUSY;
           end else begin
-            icache_enable  <= 1;
-            state_port_b   <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
+            icache_enable <= 1;
+            state_port_b  <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
           end
         end
 
         STATE_PORT_B_WAIT_ICACHE_BUSY: begin
           if (!bsyB) begin
-            icache_enable  <= 1;
-            state_port_b   <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
+            icache_enable <= 1;
+            state_port_b  <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
           end
         end
 
