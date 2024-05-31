@@ -132,6 +132,7 @@ module ICache #(
       case (state)
 
         STATE_IDLE: begin
+          // data_ready <= 0;
           if (enable) begin
 `ifdef DBG
             $display("address: 0x%h  line_ix: %0d  tag: %0h", address, line_ix, tag);

@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 //
+// Cache: instruction
+//
 `default_nettype none
 `define DBG
 
@@ -124,6 +126,7 @@ module TestBench;
     enB   = 1;
     #clk_tk;
     enB = 0;
+    #clk_tk;
 
     while (!rdyB) #clk_tk;
 
@@ -137,6 +140,7 @@ module TestBench;
     enB   = 1;
     #clk_tk;
     enB = 0;
+    #clk_tk;
 
     while (!rdyB) #clk_tk;
 
@@ -150,6 +154,7 @@ module TestBench;
     enB   = 1;
     #clk_tk;
     enB = 0;
+    #clk_tk;
 
     while (!rdyB) #clk_tk;
 
@@ -163,6 +168,7 @@ module TestBench;
     enB   = 1;
     #clk_tk;
     enB = 0;
+    #clk_tk;
 
     while (!rdyB) #clk_tk;
 

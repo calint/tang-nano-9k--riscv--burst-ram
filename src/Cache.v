@@ -36,8 +36,8 @@ module Cache #(
     input wire [ADDRESS_BITWIDTH-1:0] addrB,
     output wire [INSTRUCTION_BITWIDTH-1:0] doutB,
     input wire enB,
-    output reg rdyB,
-    output reg bsyB,
+    output wire rdyB,
+    output wire bsyB,
 
     // wiring to BurstRAM (prefix br_)
     output wire br_cmd,
@@ -65,10 +65,10 @@ module Cache #(
       .clk_ram(clk),
       .rst(rst),
       .enable(icache_enable),
-      .address(icache_address),
+      .address(addrB),
       .instruction(doutB),
-      .data_ready(icache_data_ready),
-      .busy(icache_busy),
+      .data_ready(rdyB),
+      .busy(bsyB),
 
       // wiring to BurstRAM (prefix br_)
       .br_cmd(br_cmd),
@@ -84,8 +84,6 @@ module Cache #(
   // ICacheSTATE_PORT_B_IDLE
   reg icache_enable;
   reg [ADDRESS_BITWIDTH-1:0] icache_address;
-  wire icache_data_ready;
-  wire icache_busy;
   // --
 
   localparam ADDRESS_DEPTH = 2 ** ADDRESS_BITWIDTH;
@@ -132,9 +130,7 @@ module Cache #(
 
         STATE_PORT_B_IDLE: begin
           if (enB) begin
-            rdyB <= 0;
-            bsyB <= 1;
-            if (icache_busy) begin
+            if (bsyB) begin
               state_port_b <= STATE_PORT_B_WAIT_ICACHE_BUSY;
             end else begin
               icache_address <= addrB;
@@ -145,7 +141,7 @@ module Cache #(
         end
 
         STATE_PORT_B_WAIT_ICACHE_BUSY: begin
-          if (!icache_busy) begin
+          if (!bsyB) begin
             icache_address <= addrB;
             icache_enable  <= 1;
             state_port_b   <= STATE_PORT_B_WAIT_ONE_CYCLE;
@@ -153,15 +149,13 @@ module Cache #(
         end
 
         STATE_PORT_B_WAIT_ONE_CYCLE: begin
-          icache_enable <= 0;
-          state_port_b  <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
-        end
+        //   icache_enable <= 0;
+        //   state_port_b  <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
+        // end
 
-        STATE_PORT_B_WAIT_ICACHE_DATA_READY: begin
+        // STATE_PORT_B_WAIT_ICACHE_DATA_READY: begin
           icache_enable <= 0;
-          if (icache_data_ready) begin
-            rdyB <= 1;
-            bsyB <= 0;
+          if (rdyB) begin
             state_port_b <= STATE_PORT_B_IDLE;
           end
         end
