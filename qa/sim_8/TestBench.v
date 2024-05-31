@@ -7,7 +7,7 @@
 
 module TestBench;
 
-  localparam RAM_ADDRESS_BITWIDTH = 4;
+  localparam RAM_ADDRESS_BITWIDTH = 8;
 
   BurstRAM #(
       .DATA_FILE("RAM.mem"),
@@ -29,7 +29,7 @@ module TestBench;
   );
 
   Cache #(
-      .ADDRESS_BITWIDTH(10),
+      .ADDRESS_BITWIDTH(RAM_ADDRESS_BITWIDTH),
       .INSTRUCTION_BITWIDTH(32),
       .CACHE_LINE_IX_BITWIDTH(1),
       .CACHE_IX_IN_LINE_BITWIDTH(3),
@@ -72,7 +72,7 @@ module TestBench;
   // wiring between BurstRAM and Cache
   wire br_cmd;
   wire br_cmd_en;
-  wire [3:0] br_addr;
+  wire [RAM_ADDRESS_BITWIDTH-1:0] br_addr;
   wire [63:0] br_wr_data;
   wire [7:0] br_data_mask;
   wire [63:0] br_rd_data;
@@ -81,11 +81,11 @@ module TestBench;
   // --
 
   // Cache interface
-  reg [3:0] weA = 0;
-  reg [9:0] addrA = 0;
+  reg [RAM_ADDRESS_BITWIDTH-1:0] addrA = 0;
   reg [31:0] dinA = 0;
+  reg [3:0] weA = 0;
   wire [31:0] doutA;
-  reg [9:0] addrB = 0;
+  reg [RAM_ADDRESS_BITWIDTH-1:0] addrB = 0;
   wire [31:0] doutB;
   wire rdyB;
   wire bsyB;
@@ -128,10 +128,10 @@ module TestBench;
     #clk_tk;
     #clk_tk;
 
-    if(rdyB) $display("test 2 passed");
+    if (rdyB) $display("test 2 passed");
     else $display("test 2 FAILED");
 
-    if(!bsyB) $display("test 3 passed");
+    if (!bsyB) $display("test 3 passed");
     else $display("test 3 FAILED");
 
     if (doutB == 32'h3F5A2E14) $display("test 4 passed");
