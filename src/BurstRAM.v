@@ -49,9 +49,9 @@ module BurstRAM #(
     $display("----------------------------------------");
     $display("  BurstRAM");
     $display("----------------------------------------");
-    $display("     size: %0d B", DEPTH * DATA_BITWIDTH / 8);
-    $display("    depth: %0d", DEPTH);
-    $display("data size: %0d bits", DATA_BITWIDTH);
+    $display("      size: %0d B", DEPTH * DATA_BITWIDTH / 8);
+    $display("     depth: %0d", DEPTH);
+    $display(" data size: %0d bits", DATA_BITWIDTH);
     $display("----------------------------------------");
 `endif
 
@@ -155,4 +155,5 @@ module BurstRAM #(
 endmodule
 
 `undef DBG
+`undef INFO
 `default_nettype wire

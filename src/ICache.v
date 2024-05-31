@@ -138,14 +138,15 @@ module ICache #(
     $display("----------------------------------------");
     $display("  ICache");
     $display("----------------------------------------");
-    $display("    line size: %0d B", DATA_PER_LINE * DATA_SIZE_BYTES);
-    $display("        lines: %0d", LINE_COUNT);
-    $display("data per line: %0d", DATA_PER_LINE);
-    $display("          tag: %0d bits", TAG_BITWIDTH);
-    $display("      line ix: %0d bits", LINE_IX_BITWIDTH);
-    $display("      data ix: %0d bits", DATA_IX_IN_LINE_BITWIDTH);
-    $display("        zeros: %0d bits", ADDRESS_LEADING_ZEROS_BITWIDTH);
-    $display(" br_data_mask: %0d bits", RAM_BURST_DATA_BITWIDTH / 8);
+    $display("       line size: %0d B", DATA_PER_LINE * DATA_SIZE_BYTES);
+    $display("           lines: %0d", LINE_COUNT);
+    $display("   data per line: %0d", DATA_PER_LINE);
+    $display("       data size: %0d bits", DATA_BITWIDTH);
+    $display("             tag: %0d bits", TAG_BITWIDTH);
+    $display("         line ix: %0d bits", LINE_IX_BITWIDTH);
+    $display("         data ix: %0d bits", DATA_IX_IN_LINE_BITWIDTH);
+    $display("  trailing zeros: %0d bits", ADDRESS_LEADING_ZEROS_BITWIDTH);
+    $display(" write data mask: %0d bits", RAM_BURST_DATA_BITWIDTH / 8);
     $display("----------------------------------------");
   end
 `endif
@@ -263,4 +264,5 @@ module ICache #(
 endmodule
 
 `undef DBG
+`undef INFO
 `default_nettype wire
