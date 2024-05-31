@@ -119,7 +119,7 @@ module TestBench;
 
     while (bsyB) #clk_tk;
 
-    // read instruction 0x0004
+    // read instruction 0x0004 (cache hit)
     addrB = 4;
     enB   = 1;
     #clk_tk;
@@ -132,7 +132,7 @@ module TestBench;
 
     while (bsyB) #clk_tk;
 
-    // read instruction 0x0008
+    // read instruction 0x0008 (cache hit)
     addrB = 8;
     enB   = 1;
     #clk_tk;
@@ -142,6 +142,32 @@ module TestBench;
 
     if (doutB == 32'hAB4C3E6F) $display("test 3 passed");
     else $display("test 3 FAILED");
+
+    while (bsyB) #clk_tk;
+
+    // read instruction 0x0008 (cache miss)
+    addrB = 64;
+    enB   = 1;
+    #clk_tk;
+    enB = 0;
+
+    while (!rdyB) #clk_tk;
+
+    if (doutB == 32'h4E5F6A7B) $display("test 4 passed");
+    else $display("test 4 FAILED");
+
+    while (bsyB) #clk_tk;
+
+    // read instruction 0x0008 (cache miss)
+    addrB = 32;
+    enB   = 1;
+    #clk_tk;
+    enB = 0;
+
+    while (!rdyB) #clk_tk;
+
+    if (doutB == 32'h2F5E3C7A) $display("test 5 passed");
+    else $display("test 5 FAILED");
 
     while (bsyB) #clk_tk;
 

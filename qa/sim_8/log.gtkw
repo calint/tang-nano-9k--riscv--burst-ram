@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Fri May 31 17:22:47 2024
+[*] Fri May 31 17:32:46 2024
 [*]
 [dumpfile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_8/log.vcd"
-[dumpfile_mtime] "Fri May 31 17:20:25 2024"
-[dumpfile_size] 8324
+[dumpfile_mtime] "Fri May 31 17:32:33 2024"
+[dumpfile_size] 12393
 [savefile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_8/log.gtkw"
 [timestart] 0
 [size] 1910 1024
 [pos] -1 -1
-*-14.804305 145000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-15.889692 85000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TestBench.
 [treeopen] TestBench.cache.
 [sst_width] 269
@@ -28,9 +28,11 @@ TestBench.addrB[9:0]
 TestBench.cache.icache_address[9:0]
 @28
 TestBench.cache.icache_busy
+@29
 TestBench.cache.icache_data_ready
+@28
 TestBench.cache.icache_enable
-@23
+@22
 TestBench.cache.icache.instruction[31:0]
 [pattern_trace] 1
 [pattern_trace] 0
