@@ -16,7 +16,7 @@ module TestBench;
       .CYCLES_BEFORE_DATA_READY(3),
       .BURST_COUNT(4)
   ) burst_ram (
-      .clk(clk),
+      .clk(clk_ram),
       .rst(rst),
       .cmd(br_cmd),
       .cmd_en(br_cmd_en),
@@ -46,16 +46,17 @@ module TestBench;
       //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * INSTRUCTION_BITWIDTH =
       //       32B
   ) cache (
-      .clk  (clk),
-      .rst  (rst),
-      .weA  (4'b0000),
+      .clk(clk),
+      .clk_ram(clk_ram),
+      .rst(rst),
+      .weA(4'b0000),
       .addrA(addrA),
-      .dinA (dinA),
+      .dinA(dinA),
       .doutA(doutA),
       .addrB(addrB),
       .doutB(doutB),
-      .rdyB (rdyB),
-      .bsyB (bsyB),
+      .rdyB(rdyB),
+      .bsyB(bsyB),
 
       // wiring to BurstRAM (prefix br_)
       .br_cmd(br_cmd),
@@ -90,10 +91,15 @@ module TestBench;
   wire bsyB;
   // --
 
-
+  // CPU clock
   localparam clk_tk = 10;
   reg clk = 0;
   always #(clk_tk / 2) clk = ~clk;
+
+  // RAM clock
+  localparam clk_ram_tk = 2;
+  reg clk_ram = 0;
+  always #(clk_ram_tk / 2) clk_ram = ~clk_ram;
 
   reg rst = 1;
 

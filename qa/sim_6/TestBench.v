@@ -36,7 +36,6 @@ module TestBench;
       //       result in same number of bytes because a cache line is loaded by the size of a burst
   ) dut (
       .clk(clk),
-      .clk_ram(clk),
       .rst(rst),
       .enable(enable),
       .address(address),
@@ -48,8 +47,6 @@ module TestBench;
       .br_cmd(br_cmd),
       .br_cmd_en(br_cmd_en),
       .br_addr(br_addr),
-      .br_wr_data(br_wr_data),
-      .br_data_mask(br_data_mask),
       .br_rd_data(br_rd_data),
       .br_rd_data_valid(br_rd_data_valid),
       .br_busy(br_busy)

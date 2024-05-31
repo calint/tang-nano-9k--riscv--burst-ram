@@ -28,6 +28,7 @@ module Cache #(
     //       32B
 ) (
     input wire clk,
+    input wire clk_ram,
     input wire rst,
     input wire [NUM_COL-1:0] weA,
     input wire [ADDRESS_BITWIDTH-1:0] addrA,
@@ -60,8 +61,7 @@ module Cache #(
       // note: size of INSTRUCTION_IX_IN_LINE_BITWIDTH and RAM_READ_BURST_COUNT must
       //       result in same number of bytes because a cache line is loaded by the size of a burst
   ) icache (
-      .clk(clk),
-      .clk_ram(clk),
+      .clk(clk_ram),
       .rst(rst),
       .enable(icache_enable),
       .address(addrB),
@@ -73,8 +73,6 @@ module Cache #(
       .br_cmd(br_cmd),
       .br_cmd_en(br_cmd_en),
       .br_addr(br_addr),
-      .br_wr_data(br_wr_data),
-      .br_data_mask(br_data_mask),
       .br_rd_data(br_rd_data),
       .br_rd_data_valid(br_rd_data_valid),
       .br_busy(br_busy)
@@ -82,7 +80,6 @@ module Cache #(
 
   // ICacheSTATE_PORT_B_IDLE
   reg icache_enable;
-  reg [ADDRESS_BITWIDTH-1:0] icache_address;
   // --
 
   localparam ADDRESS_DEPTH = 2 ** ADDRESS_BITWIDTH;
@@ -130,7 +127,6 @@ module Cache #(
           if (bsyB) begin
             state_port_b <= STATE_PORT_B_WAIT_ICACHE_BUSY;
           end else begin
-            icache_address <= addrB;
             icache_enable  <= 1;
             state_port_b   <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
           end
@@ -138,7 +134,6 @@ module Cache #(
 
         STATE_PORT_B_WAIT_ICACHE_BUSY: begin
           if (!bsyB) begin
-            icache_address <= addrB;
             icache_enable  <= 1;
             state_port_b   <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
           end

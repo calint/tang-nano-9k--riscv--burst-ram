@@ -5,7 +5,7 @@
 `default_nettype none
 //`define DBG
 
-module ICache #(
+module DCache #(
     parameter ADDRESS_BITWIDTH = 32,
     // device addressing assumed to be 32 bit
     parameter INSTRUCTION_BITWIDTH = 32,
@@ -43,6 +43,8 @@ module ICache #(
     output reg br_cmd,
     output reg br_cmd_en,
     output reg [RAM_DEPTH_BITWIDTH-1:0] br_addr,
+    output reg [RAM_BURST_DATA_BITWIDTH-1:0] br_wr_data,
+    output reg [RAM_BURST_DATA_BITWIDTH/8-1:0] br_data_mask,
     input wire [RAM_BURST_DATA_BITWIDTH-1:0] br_rd_data,
     input wire br_rd_data_valid,
     input wire br_busy
@@ -115,7 +117,7 @@ module ICache #(
   end
 `endif
 
-  always @(posedge clk) begin
+  always @(posedge clk_ram) begin
     if (rst) begin
       state <= STATE_IDLE;
       busy <= 0;
