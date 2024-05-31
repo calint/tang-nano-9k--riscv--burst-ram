@@ -13,7 +13,7 @@ module ICache #(
     parameter LINE_IX_BITWIDTH = 1,
     // 2^1 cache lines
     parameter DATA_IX_IN_LINE_BITWIDTH = 3,
-    // 2^3 => instructions per cache line, 8 * 4 = 32 B
+    // 2^3 => data per cache line, 8 * 4 = 32 B
     parameter RAM_BURST_DATA_COUNT = 4,
     // how many consequitive data is retrieved by BurstRAM
     parameter RAM_BURST_DATA_BITWIDTH = 64,
@@ -22,10 +22,10 @@ module ICache #(
     // note: the burst size and cache line data must match in size
     //       a burst reads or writes one cache line thus:
     //       RAM_BURST_DATA_COUNT * RAM_BURST_DATA_BITWIDTH / 8 = 
-    //       2 ^ INSTRUCTION_IX_IN_LINE_BITWIDTH * INSTRUCTION_BITWIDTH =
-    //       32B
+    //       2 ^ DATA_IX_IN_LINE_BITWIDTH * DATA_BITWIDTH =
+    //       32 B
     parameter RAM_DEPTH_BITWIDTH = 4
-    // size of RAM: 2^RAM_DEPTH_BITWIDTH*RAM_BURST_DATA_BITWIDTH
+    // size of RAM: 2 ^ RAM_DEPTH_BITWIDTH * RAM_BURST_DATA_BITWIDTH
 ) (
     input wire clk,  // device clock
     input wire rst,  // reset
