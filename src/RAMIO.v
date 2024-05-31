@@ -38,6 +38,43 @@ module RAMIO #(
     input  wire uart_rx
 );
 
+  RAM #(
+      .ADDR_WIDTH(ADDR_WIDTH),
+      .DATA_FILE (DATA_FILE)
+  ) ram (
+      .clk  (clk),
+      .weA  (ram_weA),
+      .addrA(ram_addrA),
+      .dinA (ram_dinA),
+      .doutA(ram_doutA),
+      .addrB(addrB[ADDR_WIDTH+1:2]),
+      .doutB(doutB)
+  );
+
+  UartTx #(
+      .CLK_FREQ (CLK_FREQ),
+      .BAUD_RATE(BAUD_RATE)
+  ) uarttx (
+      .rst(rst),
+      .clk(clk),
+      .data(uarttx_data),  // data to send
+      .go(uarttx_go),  // enable to start transmission, disable after 'data' has been read
+      .tx(uart_tx),  // uart tx wire
+      .bsy(uarttx_bsy)  // enabled while sendng
+  );
+
+  UartRx #(
+      .CLK_FREQ (CLK_FREQ),
+      .BAUD_RATE(BAUD_RATE)
+  ) uartrx (
+      .rst(rst),
+      .clk(clk),
+      .rx(uart_rx),  // uart rx wire
+      .go(uartrx_go),  // enable to start receiving, disable to acknowledge 'dr'
+      .data(uartrx_data),  // current data being received, is incomplete until 'dr' is enabled
+      .dr(uartrx_dr)  // enabled when data is ready
+  );
+
   // RAM
   reg [ADDR_WIDTH-1:0] ram_addrA;  // address of ram port A
   reg [DATA_WIDTH-1:0] ram_dinA;  // data from ram port A
@@ -200,43 +237,6 @@ module RAMIO #(
       end
     end
   end
-
-  RAM #(
-      .ADDR_WIDTH(ADDR_WIDTH),
-      .DATA_FILE (DATA_FILE)
-  ) ram (
-      .clk  (clk),
-      .weA  (ram_weA),
-      .addrA(ram_addrA),
-      .dinA (ram_dinA),
-      .doutA(ram_doutA),
-      .addrB(addrB[ADDR_WIDTH+1:2]),
-      .doutB(doutB)
-  );
-
-  UartTx #(
-      .CLK_FREQ (CLK_FREQ),
-      .BAUD_RATE(BAUD_RATE)
-  ) uarttx (
-      .rst(rst),
-      .clk(clk),
-      .data(uarttx_data),  // data to send
-      .go(uarttx_go),  // enable to start transmission, disable after 'data' has been read
-      .tx(uart_tx),  // uart tx wire
-      .bsy(uarttx_bsy)  // enabled while sendng
-  );
-
-  UartRx #(
-      .CLK_FREQ (CLK_FREQ),
-      .BAUD_RATE(BAUD_RATE)
-  ) uartrx (
-      .rst(rst),
-      .clk(clk),
-      .rx(uart_rx),  // uart rx wire
-      .go(uartrx_go),  // enable to start receiving, disable to acknowledge 'dr'
-      .data(uartrx_data),  // current data being received, is incomplete until 'dr' is enabled
-      .dr(uartrx_dr)  // enabled when data is ready
-  );
 
 endmodule
 
