@@ -35,7 +35,6 @@ module Cache #(
     output reg [DATA_BITWIDTH-1:0] doutA,
     input wire [ADDRESS_BITWIDTH-1:0] addrB,
     output wire [INSTRUCTION_BITWIDTH-1:0] doutB,
-    input wire enB,
     output wire rdyB,
     output wire bsyB,
 
@@ -128,14 +127,12 @@ module Cache #(
       case (state_port_b)
 
         STATE_PORT_B_IDLE: begin
-          if (enB) begin
-            if (bsyB) begin
-              state_port_b <= STATE_PORT_B_WAIT_ICACHE_BUSY;
-            end else begin
-              icache_address <= addrB;
-              icache_enable  <= 1;
-              state_port_b   <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
-            end
+          if (bsyB) begin
+            state_port_b <= STATE_PORT_B_WAIT_ICACHE_BUSY;
+          end else begin
+            icache_address <= addrB;
+            icache_enable  <= 1;
+            state_port_b   <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
           end
         end
 

@@ -54,7 +54,6 @@ module TestBench;
       .doutA(doutA),
       .addrB(addrB),
       .doutB(doutB),
-      .enB  (enB),
       .rdyB (rdyB),
       .bsyB (bsyB),
 
@@ -87,7 +86,6 @@ module TestBench;
   wire [31:0] doutA;
   reg [9:0] addrB = 0;
   wire [31:0] doutB;
-  reg enB = 0;
   wire rdyB;
   wire bsyB;
   // --
@@ -110,9 +108,7 @@ module TestBench;
 
     // read instruction 0x0000
     addrB = 0;
-    enB   = 1;
     #clk_tk;
-    enB = 0;
 
     while (!rdyB) #clk_tk;
 
@@ -123,9 +119,7 @@ module TestBench;
 
     // read instruction 0x0004 (cache hit)
     addrB = 4;
-    enB   = 1;
     #clk_tk;
-    enB = 0;
     #clk_tk;
 
     while (!rdyB) #clk_tk;
@@ -137,9 +131,7 @@ module TestBench;
 
     // read instruction 0x0008 (cache hit)
     addrB = 8;
-    enB   = 1;
     #clk_tk;
-    enB = 0;
     #clk_tk;
 
     while (!rdyB) #clk_tk;
@@ -151,9 +143,7 @@ module TestBench;
 
     // read instruction 0x0008 (cache miss)
     addrB = 64;
-    enB   = 1;
     #clk_tk;
-    enB = 0;
     #clk_tk;
 
     while (!rdyB) #clk_tk;
@@ -165,9 +155,7 @@ module TestBench;
 
     // read instruction 0x0008 (cache miss)
     addrB = 32;
-    enB   = 1;
     #clk_tk;
-    enB = 0;
     #clk_tk;
 
     while (!rdyB) #clk_tk;
