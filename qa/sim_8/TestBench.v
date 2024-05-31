@@ -115,6 +115,7 @@ module TestBench;
     // read instruction 0x0000
     addrB = 0;
     #clk_tk;
+    #clk_tk;
 
     while (!rdyB) #clk_tk;
 
