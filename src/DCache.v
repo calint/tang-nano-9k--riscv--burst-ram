@@ -1,5 +1,5 @@
 //
-// instruction cache containg a BurstRAM component
+// data cache connected to BurstRAM
 //
 
 `default_nettype none
