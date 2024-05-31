@@ -49,7 +49,7 @@ module TestBench;
       .clk(clk),
       .clk_ram(clk_ram),
       .rst(rst),
-      .weA(4'b0000),
+      .weA(weA),
       .addrA(addrA),
       .dinA(dinA),
       .doutA(doutA),
