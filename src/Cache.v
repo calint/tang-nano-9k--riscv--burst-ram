@@ -27,8 +27,7 @@ module Cache #(
     //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * INSTRUCTION_BITWIDTH / 8 =
     //       32 B
 ) (
-    input wire clk_cpu,
-    input wire clk_ram,
+    input wire clk,
     input wire rst,
     input wire [NUM_COL-1:0] weA,
     input wire [ADDRESS_BITWIDTH-1:0] addrA,
@@ -61,7 +60,7 @@ module Cache #(
       // note: size of INSTRUCTION_IX_IN_LINE_BITWIDTH and RAM_READ_BURST_COUNT must
       //       result in same number of bytes because a cache line is loaded by the size of a burst
   ) icache (
-      .clk(clk_ram),
+      .clk(clk),
       .rst(rst),
       .enable(icache_enable),
       .address(addrB),
@@ -96,14 +95,14 @@ module Cache #(
 
   reg [3:0] state_port_b;
 
-  always @(posedge clk_cpu) begin
+  always @(posedge clk) begin
     if (rst) begin
       state_port_b <= STATE_PORT_B_IDLE;
     end
   end
 
   // Port-A Operation
-  always @(posedge clk_cpu) begin
+  always @(posedge clk) begin
     for (integer i = 0; i < NUM_COL; i = i + 1) begin
       if (weA[i]) begin
         data[addrA][i*COL_WIDTH+:COL_WIDTH] <= dinA[i*COL_WIDTH+:COL_WIDTH];
@@ -113,7 +112,7 @@ module Cache #(
   end
 
   // Port-B Operation:
-  always @(posedge clk_cpu) begin
+  always @(posedge clk) begin
     if (!rst) begin
 
 `ifdef DBG
