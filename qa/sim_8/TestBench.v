@@ -43,8 +43,8 @@ module TestBench;
       // note: the burst size and cache line data must match in size
       //       a burst reads or writes one cache line thus:
       //       RAM_BURST_DATA_COUNT * RAM_BURST_DATA_BITWIDTH / 8 = 
-      //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * INSTRUCTION_BITWIDTH =
-      //       32B
+      //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * INSTRUCTION_BITWIDTH / 8 =
+      //       32 B
   ) cache (
       .clk(clk),
       .clk_ram(clk_ram),
