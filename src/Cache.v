@@ -8,17 +8,18 @@
 //`define DBG
 
 module Cache #(
-    parameter ADDRESS_BITWIDTH = 12,  // 2^12 = RAM depth
+    parameter ADDRESS_BITWIDTH = 12,  // 2 ^ 12 = RAM depth
     parameter INSTRUCTION_BITWIDTH = 32,
     // size of an instruction. must be divisble by 8
     parameter CACHE_LINE_IX_BITWIDTH = 1,
     // 2^1 cache lines
     parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
     // 2^3 => instructions per cache line,B 8 * 4 = 32 B
-    // how many consequitive data is retrieved by BurstRAM
     parameter RAM_DEPTH_BITWIDTH = 4,
-    parameter RAM_BURST_DATA_BITWIDTH = 64,
-    parameter RAM_BURST_DATA_COUNT = 4
+    // depth of underlying RAM which can e.g. be 8 byte word
+    parameter RAM_BURST_DATA_COUNT = 4,
+    // how many consequitive data is retrieved by BurstRAM
+    parameter RAM_BURST_DATA_BITWIDTH = 64
     // size of data sent in bits, must be divisible by 8 into bytes
     // RAM reads 4 * 8 = 32 B per burst
     // note: the burst size and cache line data must match in size

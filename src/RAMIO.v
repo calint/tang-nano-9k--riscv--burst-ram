@@ -14,12 +14,20 @@ module RAMIO #(
     parameter TOP_ADDR = {(ADDR_WIDTH + 2) {1'b1}},
     parameter ADDR_LEDS = TOP_ADDR,  // address of leds, 7 bits, rgb 4:6 enabled is off
     parameter ADDR_UART_OUT = TOP_ADDR - 1,  // send byte address
-    parameter ADDR_UART_IN = TOP_ADDR - 2  // received byte address, must be read with 'lbu'
+    parameter ADDR_UART_IN = TOP_ADDR - 2,  // received byte address, must be read with 'lbu'
+
+    // RAM and cache
+    parameter CACHE_LINE_IX_BITWIDTH = 1,
+    parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
+    parameter RAM_DEPTH_BITWIDTH = 8,
+    parameter RAM_BURST_DATA_COUNT = 4,
+    parameter RAM_BURST_DATA_BITWIDTH = 64
 ) (
     input wire rst,
 
     // port A: data memory, read / write byte addressable ram
     input wire clk,
+    input wire clk_ram,
     input wire [1:0] weA,  // write enable port A (b01 - byte, b10 - half word, b11 - word)
     input wire [2:0] reA, // read enable port A (reA[2] sign extended, b01: byte, b10: half word, b11: word)
     input wire [ADDR_WIDTH+1:0] addrA,  // address on port A in bytes
@@ -27,16 +35,60 @@ module RAMIO #(
     output reg [DATA_WIDTH-1:0] doutA,  // data from ram port A at 'addrA' according to 'reA'
 
     // port B: instruction memory, byte addressed, bottom 2 bits ignored, word aligned
-    input  wire [ADDR_WIDTH+1:0] addrB,  // address on ram port B in bytes
+    input wire [ADDR_WIDTH+1:0] addrB,  // address on ram port B in bytes
     output wire [DATA_WIDTH-1:0] doutB,  // data from ram port B
+    output wire rdyB,
+    output wire bsyB,
 
     // I/O mapping of leds
     output reg [5:0] leds,
 
     // uart
     output wire uart_tx,
-    input  wire uart_rx
+    input  wire uart_rx,
+
+    // wiring to BurstRAM (prefix br_)
+    output wire br_cmd,
+    output wire br_cmd_en,
+    output wire [RAM_DEPTH_BITWIDTH-1:0] br_addr,
+    output wire [RAM_BURST_DATA_BITWIDTH-1:0] br_wr_data,
+    output wire [RAM_BURST_DATA_BITWIDTH/8-1:0] br_data_mask,
+    input wire [RAM_BURST_DATA_BITWIDTH-1:0] br_rd_data,
+    input wire br_rd_data_valid,
+    input wire br_busy
 );
+
+  // Cache #(
+  //     .ADDRESS_BITWIDTH(ADDR_WIDTH + 2),
+  //     // note: +2 because byte address while ADDR_WIDTH is 4 byte word address
+  //     .INSTRUCTION_BITWIDTH(32),
+  //     .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
+  //     .CACHE_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),
+  //     .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
+  //     .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT),
+  //     .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH)
+  // ) cache (
+  //     .clk  (clk_ram),
+  //     .rst  (rst),
+  //     .weA  (ram_weA),
+  //     .addrA({ram_addrA, 2'b00}),
+  //     .dinA (ram_dinA),
+  //     .doutA(ram_doutA),
+  //     .addrB(addrB),
+  //     .doutB(doutB),
+  //     .rdyB (rdyB),
+  //     .bsyB (bsyB),
+
+  //     // wiring to BurstRAM (prefix br_)
+  //     .br_cmd(br_cmd),
+  //     .br_cmd_en(br_cmd_en),
+  //     .br_addr(br_addr),
+  //     .br_wr_data(br_wr_data),
+  //     .br_data_mask(br_data_mask),
+  //     .br_rd_data(br_rd_data),
+  //     .br_rd_data_valid(br_rd_data_valid),
+  //     .br_busy(br_busy)
+  // );
 
   RAM #(
       .ADDR_WIDTH(ADDR_WIDTH),
