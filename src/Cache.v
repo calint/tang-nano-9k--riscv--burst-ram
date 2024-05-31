@@ -14,9 +14,11 @@ module Cache #(
     parameter ICACHE_LINE_IX_BITWIDTH = 1,
     // 2^1 cache lines
     parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
-    // 2^3 => instructions per cache line, 8 * 4 = 32 B
+    // 2^3 => instructions per cache line,B 8 * 4 = 32 B
     // how many consequitive data is retrieved by BurstRAM
+    parameter RAM_DEPTH_BITWIDTH = 4,
     parameter RAM_BURST_DATA_BITWIDTH = 64,
+    parameter RAM_BURST_DATA_COUNT = 4
     // size of data sent in bits, must be divisible by 8 into bytes
     // RAM reads 4 * 8 = 32 B per burst
     // note: the burst size and cache line data must match in size
@@ -24,8 +26,6 @@ module Cache #(
     //       RAM_BURST_DATA_COUNT * RAM_BURST_DATA_BITWIDTH / 8 = 
     //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * INSTRUCTION_BITWIDTH =
     //       32B
-    parameter RAM_DEPTH_BITWIDTH = 4,
-    parameter RAM_BURST_DATA_COUNT = 4
 ) (
     input wire clk,
     input wire rst,
@@ -34,7 +34,7 @@ module Cache #(
     input wire [DATA_BITWIDTH-1:0] dinA,
     output reg [DATA_BITWIDTH-1:0] doutA,
     input wire [ADDRESS_BITWIDTH-1:0] addrB,
-    output reg [INSTRUCTION_BITWIDTH-1:0] doutB,
+    output wire [INSTRUCTION_BITWIDTH-1:0] doutB,
     input wire enB,
     output reg rdyB,
     output reg bsyB,
@@ -66,7 +66,7 @@ module Cache #(
       .rst(rst),
       .enable(icache_enable),
       .address(icache_address),
-      .instruction(icache_instruction),
+      .instruction(doutB),
       .data_ready(icache_data_ready),
       .busy(icache_busy),
 
@@ -81,10 +81,9 @@ module Cache #(
       .br_busy(br_busy)
   );
 
-  // ICache
+  // ICacheSTATE_PORT_B_IDLE
   reg icache_enable;
   reg [ADDRESS_BITWIDTH-1:0] icache_address;
-  wire [31:0] icache_instruction;
   wire icache_data_ready;
   wire icache_busy;
   // --
@@ -97,15 +96,16 @@ module Cache #(
   reg [DATA_BITWIDTH-1:0] data[ADDRESS_DEPTH-1:0];
   // note: synthesizes to SP (single port block ram)
 
-  localparam STATE_PORT_B_IDLE = 3'b000;
-  localparam STATE_PORT_B_WAITING_FOR_ICACHE_BUSY = 3'b010;
-  localparam STATE_PORT_B_WAITING_FOR_ICACHE_DATA_READY = 3'b100;
+  localparam STATE_PORT_B_IDLE = 4'b0000;
+  localparam STATE_PORT_B_WAIT_ICACHE_BUSY = 4'b0010;
+  localparam STATE_PORT_B_WAIT_ONE_CYCLE = 4'b0100;
+  localparam STATE_PORT_B_WAIT_ICACHE_DATA_READY = 4'b1000;
 
-  reg [1:0] state_port_b;
+  reg [3:0] state_port_b;
 
   always @(posedge clk) begin
     if (rst) begin
-      state_port_b <= 0;
+      state_port_b <= STATE_PORT_B_IDLE;
     end
   end
 
@@ -121,39 +121,53 @@ module Cache #(
 
   // Port-B Operation:
   always @(posedge clk) begin
-    case (state_port_b)
-      STATE_PORT_B_IDLE: begin
-        if (enB) begin
-          rdyB <= 0;
-          bsyB <= 1;
-          if (icache_busy) begin
-            state_port_b <= STATE_PORT_B_WAITING_FOR_ICACHE_BUSY;
-          end else begin
-            icache_address <= addrB;
-            icache_enable <= 1;
-            state_port_b <= STATE_PORT_B_WAITING_FOR_ICACHE_DATA_READY;
+    if (!rst) begin
+
+`ifdef DBG
+      $display("state_b: %0d  enB: %0d  icache_busy: %0d  doutB: %0h", state_port_b, enB,
+               icache_busy, doutB);
+`endif
+
+      case (state_port_b)
+
+        STATE_PORT_B_IDLE: begin
+          if (enB) begin
+            rdyB <= 0;
+            bsyB <= 1;
+            if (icache_busy) begin
+              state_port_b <= STATE_PORT_B_WAIT_ICACHE_BUSY;
+            end else begin
+              icache_address <= addrB;
+              icache_enable  <= 1;
+              state_port_b   <= STATE_PORT_B_WAIT_ONE_CYCLE;
+            end
           end
         end
-      end
 
-      STATE_PORT_B_WAITING_FOR_ICACHE_BUSY: begin
-        if (!icache_busy) begin
-          icache_address <= addrB;
-          icache_enable <= 1;
-          state_port_b <= STATE_PORT_B_WAITING_FOR_ICACHE_DATA_READY;
+        STATE_PORT_B_WAIT_ICACHE_BUSY: begin
+          if (!icache_busy) begin
+            icache_address <= addrB;
+            icache_enable  <= 1;
+            state_port_b   <= STATE_PORT_B_WAIT_ONE_CYCLE;
+          end
         end
-      end
 
-      STATE_PORT_B_WAITING_FOR_ICACHE_DATA_READY: begin
-        if (icache_data_ready) begin
-          rdyB  <= 1;
-          bsyB  <= 0;
-          doutB <= icache_instruction;
-          state_port_b <= STATE_PORT_B_IDLE;
+        STATE_PORT_B_WAIT_ONE_CYCLE: begin
+          icache_enable <= 0;
+          state_port_b  <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
         end
-      end
 
-    endcase
+        STATE_PORT_B_WAIT_ICACHE_DATA_READY: begin
+          icache_enable <= 0;
+          if (icache_data_ready) begin
+            rdyB <= 1;
+            bsyB <= 0;
+            state_port_b <= STATE_PORT_B_IDLE;
+          end
+        end
+
+      endcase
+    end
   end
 
 endmodule
