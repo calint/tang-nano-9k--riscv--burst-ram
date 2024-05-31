@@ -4,6 +4,7 @@
 
 `default_nettype none
 //`define DBG
+`define INFO
 
 module ICache #(
     parameter ADDRESS_BITWIDTH = 32,
@@ -132,16 +133,20 @@ module ICache #(
 
   wire [TAG_BITWIDTH-1:0] tag = address[ADDRESS_BITWIDTH-1-:TAG_BITWIDTH];
 
-`ifdef DBG
+`ifdef INFO
   initial begin
-    $display("ICache");
-    $display("      bitwidths");
-    $display("           tag: %0d", TAG_BITWIDTH);
-    $display("       line ix: %0d", LINE_IX_BITWIDTH);
-    $display("       data ix: %0d", DATA_IX_IN_LINE_BITWIDTH);
-    $display("         zeros: %0d", ADDRESS_LEADING_ZEROS_BITWIDTH);
-    $display("  br_data_mask: %0d", RAM_BURST_DATA_BITWIDTH/8);
-    $display("    line count: %0d", LINE_COUNT);
+    $display("----------------------------------------");
+    $display("  ICache");
+    $display("----------------------------------------");
+    $display("    line size: %0d B", DATA_PER_LINE * DATA_SIZE_BYTES);
+    $display("        lines: %0d", LINE_COUNT);
+    $display("data per line: %0d", DATA_PER_LINE);
+    $display("          tag: %0d bits", TAG_BITWIDTH);
+    $display("      line ix: %0d bits", LINE_IX_BITWIDTH);
+    $display("      data ix: %0d bits", DATA_IX_IN_LINE_BITWIDTH);
+    $display("        zeros: %0d bits", ADDRESS_LEADING_ZEROS_BITWIDTH);
+    $display(" br_data_mask: %0d bits", RAM_BURST_DATA_BITWIDTH / 8);
+    $display("----------------------------------------");
   end
 `endif
 

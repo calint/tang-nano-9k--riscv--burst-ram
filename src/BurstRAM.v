@@ -4,7 +4,8 @@
 //
 
 `default_nettype none
-//`define DBG
+// `define DBG
+`define INFO
 
 module BurstRAM #(
     parameter DEPTH_BITWIDTH = 4,  // 2^4 * 8B entries
@@ -43,6 +44,17 @@ module BurstRAM #(
   reg [2:0] state;
 
   initial begin
+
+`ifdef INFO
+    $display("----------------------------------------");
+    $display("  BurstRAM");
+    $display("----------------------------------------");
+    $display("     size: %0d B", DEPTH * DATA_BITWIDTH / 8);
+    $display("    depth: %0d", DEPTH);
+    $display("data size: %0d bits", DATA_BITWIDTH);
+    $display("----------------------------------------");
+`endif
+
     if (DATA_FILE != "") begin
       $readmemh(DATA_FILE, data, 0, DEPTH - 1);
     end
