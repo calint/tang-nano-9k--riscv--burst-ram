@@ -33,7 +33,7 @@ module ICache #(
     parameter RAM_DEPTH_BITWIDTH = 4
     // size of RAM: 4 ^ RAM_DEPTH_BITWIDTH * RAM_BURST_DATA_BITWIDTH
 ) (
-    input wire clk,  // device clock
+    input wire clk,  // RAM clock
 
     input wire rst,  // reset
 
@@ -170,7 +170,7 @@ module ICache #(
 `ifdef DBG
             $display("address: 0x%h  line_ix: %0d  tag: %0h", address, line_ix, tag);
             if (cache_line_valid[line_ix] && cache_line_tag[line_ix] != tag) begin
-              $display("TAG MISSMATCH, evict");
+              $display("TAG MISMATCH, evict");
             end
 `endif
 

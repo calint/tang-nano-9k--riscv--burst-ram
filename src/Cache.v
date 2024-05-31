@@ -25,7 +25,7 @@ module Cache #(
     // same as specified to BurstRAM
 
     parameter RAM_BURST_DATA_COUNT = 4,
-    // how many consequitive data is retrieved by BurstRAM
+    // how many consecutive data is retrieved by BurstRAM
 
     parameter RAM_BURST_DATA_BITWIDTH = 64
     // size of data sent in bits, must be divisible by 8 into bytes
