@@ -128,24 +128,22 @@ module TestBench;
     #clk_tk;
     #clk_tk;
 
-    while (!rdyB) #clk_tk;
-
-    if (doutB == 32'h3F5A2E14) $display("test 2 passed");
+    if(rdyB) $display("test 2 passed");
     else $display("test 2 FAILED");
 
-    while (bsyB) #clk_tk;
+    if(!bsyB) $display("test 3 passed");
+    else $display("test 3 FAILED");
+
+    if (doutB == 32'h3F5A2E14) $display("test 4 passed");
+    else $display("test 4 FAILED");
 
     // read instruction 0x0008 (cache hit)
     addrB = 8;
     #clk_tk;
     #clk_tk;
 
-    while (!rdyB) #clk_tk;
-
     if (doutB == 32'hAB4C3E6F) $display("test 3 passed");
     else $display("test 3 FAILED");
-
-    while (bsyB) #clk_tk;
 
     // read instruction 0x0008 (cache miss)
     addrB = 64;
@@ -159,7 +157,7 @@ module TestBench;
 
     while (bsyB) #clk_tk;
 
-    // read instruction 0x0008 (cache miss)
+    // read instruction 0x0008 (cache miss, eviction)
     addrB = 32;
     #clk_tk;
     #clk_tk;
@@ -171,7 +169,6 @@ module TestBench;
 
     while (bsyB) #clk_tk;
 
-    #clk_tk;
     #clk_tk;
     #clk_tk;
     #clk_tk;
