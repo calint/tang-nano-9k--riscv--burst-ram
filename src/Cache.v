@@ -96,8 +96,7 @@ module Cache #(
 
   localparam STATE_PORT_B_IDLE = 4'b0000;
   localparam STATE_PORT_B_WAIT_ICACHE_BUSY = 4'b0010;
-  localparam STATE_PORT_B_WAIT_ONE_CYCLE = 4'b0100;
-  localparam STATE_PORT_B_WAIT_ICACHE_DATA_READY = 4'b1000;
+  localparam STATE_PORT_B_WAIT_ICACHE_DATA_READY = 4'b0100;
 
   reg [3:0] state_port_b;
 
@@ -135,7 +134,7 @@ module Cache #(
             end else begin
               icache_address <= addrB;
               icache_enable  <= 1;
-              state_port_b   <= STATE_PORT_B_WAIT_ONE_CYCLE;
+              state_port_b   <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
             end
           end
         end
@@ -144,16 +143,11 @@ module Cache #(
           if (!bsyB) begin
             icache_address <= addrB;
             icache_enable  <= 1;
-            state_port_b   <= STATE_PORT_B_WAIT_ONE_CYCLE;
+            state_port_b   <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
           end
         end
 
-        STATE_PORT_B_WAIT_ONE_CYCLE: begin
-        //   icache_enable <= 0;
-        //   state_port_b  <= STATE_PORT_B_WAIT_ICACHE_DATA_READY;
-        // end
-
-        // STATE_PORT_B_WAIT_ICACHE_DATA_READY: begin
+        STATE_PORT_B_WAIT_ICACHE_DATA_READY: begin
           icache_enable <= 0;
           if (rdyB) begin
             state_port_b <= STATE_PORT_B_IDLE;

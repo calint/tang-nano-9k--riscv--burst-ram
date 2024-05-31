@@ -1,10 +1,10 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Fri May 31 18:23:00 2024
+[*] Fri May 31 18:26:02 2024
 [*]
 [dumpfile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_8/log.vcd"
-[dumpfile_mtime] "Fri May 31 18:21:28 2024"
-[dumpfile_size] 12187
+[dumpfile_mtime] "Fri May 31 18:25:56 2024"
+[dumpfile_size] 12112
 [savefile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_8/log.gtkw"
 [timestart] 0
 [size] 1910 1024
