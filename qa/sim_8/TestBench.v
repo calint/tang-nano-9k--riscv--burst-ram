@@ -31,7 +31,7 @@ module TestBench;
   Cache #(
       .ADDRESS_BITWIDTH(10),
       .INSTRUCTION_BITWIDTH(32),
-      .ICACHE_LINE_IX_BITWIDTH(1),
+      .CACHE_LINE_IX_BITWIDTH(1),
       .CACHE_IX_IN_LINE_BITWIDTH(3),
       // 2^3 => instructions per cache line, 8 * 4 = 32 B
       // how many consequitive data is retrieved by BurstRAM

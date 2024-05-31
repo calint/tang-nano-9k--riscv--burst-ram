@@ -11,7 +11,7 @@ module Cache #(
     parameter ADDRESS_BITWIDTH = 12,  // 2^12 = RAM depth
     parameter INSTRUCTION_BITWIDTH = 32,
     // size of an instruction. must be divisble by 8
-    parameter ICACHE_LINE_IX_BITWIDTH = 1,
+    parameter CACHE_LINE_IX_BITWIDTH = 1,
     // 2^1 cache lines
     parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
     // 2^3 => instructions per cache line,B 8 * 4 = 32 B
@@ -51,7 +51,7 @@ module Cache #(
 );
 
   ICache #(
-      .LINE_IX_BITWIDTH(ICACHE_LINE_IX_BITWIDTH),  // 2^1 cache lines
+      .LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
       .ADDRESS_BITWIDTH(ADDRESS_BITWIDTH),
       .INSTRUCTION_BITWIDTH(32),  // 4 B per instruction
       .INSTRUCTION_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),  // 2^3 32 bit instructions per cache line (32B)
