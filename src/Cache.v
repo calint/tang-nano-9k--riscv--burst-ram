@@ -8,17 +8,25 @@
 //`define DBG
 
 module Cache #(
-    parameter ADDRESS_BITWIDTH = 12,  // 2 ^ 12 = RAM depth
+    parameter ADDRESS_BITWIDTH = 32,
+    // 2 ^ 32 addressable bytes
+
     parameter INSTRUCTION_BITWIDTH = 32,
-    // size of an instruction. must be divisble by 8
+    // size of an instruction must be divisble by 8
+    
     parameter CACHE_LINE_IX_BITWIDTH = 1,
-    // 2^1 cache lines
+    // 2 ^ 1 = 2 cache lines x 32 B
+    
     parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
-    // 2^3 => instructions per cache line,B 8 * 4 = 32 B
+    // 2 ^ 3 = 8 instructions per cache line
+    
     parameter RAM_DEPTH_BITWIDTH = 4,
-    // depth of underlying RAM which can e.g. be 8 byte word
+    // 2 ^ 4 = 16 RAM entries of size RAM_BURST_DATA_BITWIDTH
+    // same as specified to BurstRAM
+    
     parameter RAM_BURST_DATA_COUNT = 4,
     // how many consequitive data is retrieved by BurstRAM
+    
     parameter RAM_BURST_DATA_BITWIDTH = 64
     // size of data sent in bits, must be divisible by 8 into bytes
     // RAM reads 4 * 8 = 32 B per burst
@@ -51,8 +59,8 @@ module Cache #(
 );
 
   ICache #(
-      .LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
       .ADDRESS_BITWIDTH(ADDRESS_BITWIDTH),
+      .LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
       .DATA_BITWIDTH(32),  // 4 B per instruction
       .DATA_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),  // 2^3 32 bit instructions per cache line (32B)
       .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
@@ -78,17 +86,13 @@ module Cache #(
       .br_busy(br_busy)
   );
 
-  // ICacheSTATE_PORT_B_IDLE
+  // ICache wiring
   reg icache_enable;
   // --
 
-  localparam ADDRESS_DEPTH = 2 ** ADDRESS_BITWIDTH;
   localparam NUM_COL = 4;  // 4
   localparam COL_WIDTH = 8;  // 1 byte
   localparam DATA_BITWIDTH = NUM_COL * COL_WIDTH;  // data width in bits
-
-  reg [DATA_BITWIDTH-1:0] data[ADDRESS_DEPTH-1:0];
-  // note: synthesizes to SP (single port block ram)
 
   localparam STATE_PORT_B_IDLE = 4'b0000;
   localparam STATE_PORT_B_WAIT_ICACHE_BUSY = 4'b0010;
@@ -106,10 +110,10 @@ module Cache #(
   always @(posedge clk) begin
     for (integer i = 0; i < NUM_COL; i = i + 1) begin
       if (weA[i]) begin
-        data[addrA][i*COL_WIDTH+:COL_WIDTH] <= dinA[i*COL_WIDTH+:COL_WIDTH];
+        // data[addrA][i*COL_WIDTH+:COL_WIDTH] <= dinA[i*COL_WIDTH+:COL_WIDTH];
       end
     end
-    doutA <= data[addrA];
+    // doutA <= data[addrA];
   end
 
   // Port-B Operation:

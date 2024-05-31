@@ -7,7 +7,7 @@
 
 module TestBench;
 
-  localparam RAM_ADDRESS_BITWIDTH = 8;
+  localparam RAM_ADDRESS_BITWIDTH = 8;  // 2 ^ 8 * 8 bytes RAM
 
   BurstRAM #(
       .DATA_FILE("RAM.mem"),
@@ -29,14 +29,22 @@ module TestBench;
   );
 
   Cache #(
-      .ADDRESS_BITWIDTH(RAM_ADDRESS_BITWIDTH),
+      .ADDRESS_BITWIDTH(32),
+      
       .INSTRUCTION_BITWIDTH(32),
+      
       .CACHE_LINE_IX_BITWIDTH(1),
+      // 2 ^ 1 = 2 cache lines
+
       .CACHE_IX_IN_LINE_BITWIDTH(3),
-      // 2^3 => instructions per cache line, 8 * 4 = 32 B
-      // how many consequitive data is retrieved by BurstRAM
+      // 2 ^ 3 = 8 instructions per cache line, 8 * 4 = 32 B
+
       .RAM_DEPTH_BITWIDTH(RAM_ADDRESS_BITWIDTH),
+      // same as specified in BurstRAM
+
       .RAM_BURST_DATA_COUNT(4),
+      // how many consecutive datas are retrieved in a burst
+
       .RAM_BURST_DATA_BITWIDTH(64)
       // size of data sent in bits, must be divisible by 8 into bytes
       // RAM reads 4 * 8 = 32 B per burst
@@ -45,17 +53,18 @@ module TestBench;
       //       RAM_BURST_DATA_COUNT * RAM_BURST_DATA_BITWIDTH / 8 = 
       //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * INSTRUCTION_BITWIDTH / 8 =
       //       32 B
+
   ) cache (
-      .clk(clk_ram),
-      .rst(rst),
-      .weA(weA),
+      .clk  (clk_ram),
+      .rst  (rst),
+      .weA  (weA),
       .addrA(addrA),
-      .dinA(dinA),
+      .dinA (dinA),
       .doutA(doutA),
       .addrB(addrB),
       .doutB(doutB),
-      .rdyB(rdyB),
-      .bsyB(bsyB),
+      .rdyB (rdyB),
+      .bsyB (bsyB),
 
       // wiring to BurstRAM (prefix br_)
       .br_cmd(br_cmd),
@@ -80,11 +89,11 @@ module TestBench;
   // --
 
   // Cache interface
-  reg [RAM_ADDRESS_BITWIDTH-1:0] addrA = 0;
+  reg [31:0] addrA = 0;
   reg [31:0] dinA = 0;
   reg [3:0] weA = 0;
   wire [31:0] doutA;
-  reg [RAM_ADDRESS_BITWIDTH-1:0] addrB = 0;
+  reg [31:0] addrB = 0;
   wire [31:0] doutB;
   wire rdyB;
   wire bsyB;

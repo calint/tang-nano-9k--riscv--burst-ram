@@ -19,7 +19,6 @@ iverilog -Winfloop -pfileline=1 -o iverilog.vvp \
     $TB \
     $SRCPTH/BurstRAM.v \
     $SRCPTH/ICache.v \
-    $SRCPTH/DCache.v \
     $SRCPTH/Cache.v \
     $SRCPTH/RAM.v \
     $SRCPTH/UartTx.v \
