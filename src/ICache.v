@@ -71,9 +71,8 @@ module ICache #(
   localparam DATA_PER_LINE = 2 ** DATA_IX_IN_LINE_BITWIDTH;
   // number of data per cache line
 
-  localparam RAM_ALIGNMENT_BITWIDTH = $clog2(DATA_PER_LINE);
-  // the lower bits ignored when addressing a cache line in RAM
-  // note: data stored in ram is RAM_BURST_DATA_BITWIDTH
+  localparam CACHE_LINE_ALIGNMENT_BITWIDTH = $clog2(DATA_PER_LINE);
+  // the lower bits of address ignored when addressing the cache line in RAM
 
   localparam DATA_PER_RAM_DATA = RAM_BURST_DATA_BITWIDTH / DATA_BITWIDTH;
   // number of data elements per RAM data retrieved, must be evenly divisible
@@ -176,6 +175,7 @@ module ICache #(
         STATE_IDLE: begin
           // data_ready <= 0;
           if (enable) begin
+
 `ifdef DBG
             $display("address: 0x%h  line_ix: %0d  tag: %0h", address, line_ix, tag);
             if (cache_line_valid[line_ix] && cache_line_tag[line_ix] != tag) begin
@@ -204,7 +204,7 @@ module ICache #(
               data_ready <= 0;
               br_cmd <= 0;  // read
               // extract the cache line address from current address
-              br_addr <= address[ADDRESS_BITWIDTH-1:RAM_ALIGNMENT_BITWIDTH];
+              br_addr <= address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH];
               br_cmd_en <= 1;
               cache_line_valid[line_ix] <= 1;
               // note: ok to flag cache line as valid here

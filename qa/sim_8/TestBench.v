@@ -31,7 +31,7 @@ module TestBench;
   Cache #(
       .ADDRESS_BITWIDTH(32),
       
-      .INSTRUCTION_BITWIDTH(32),
+      .DATA_BITWIDTH(32),
       
       .CACHE_LINE_IX_BITWIDTH(1),
       // 2 ^ 1 = 2 cache lines

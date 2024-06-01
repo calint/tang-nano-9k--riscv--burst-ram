@@ -11,21 +11,21 @@ module Cache #(
     parameter ADDRESS_BITWIDTH = 32,
     // 2 ^ 32 addressable bytes
 
-    parameter INSTRUCTION_BITWIDTH = 32,
-    // size of an instruction; must be divisble by 8
+    parameter DATA_BITWIDTH = 32,
+    // size of data; must be divisble by 8
 
     parameter CACHE_LINE_IX_BITWIDTH = 1,
-    // 2 ^ 1 = 2 cache lines x 32 B
+    // 2 ^ 1 = 2 cache lines
 
     parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
-    // 2 ^ 3 = 8 instructions per cache line
+    // 2 ^ 3 = 8 data per cache line
 
     parameter RAM_DEPTH_BITWIDTH = 4,
     // 2 ^ 4 = 16 RAM entries of size RAM_BURST_DATA_BITWIDTH
-    // same as specified to BurstRAM
+    // note: must be same as specified to BurstRAM
 
     parameter RAM_BURST_DATA_COUNT = 4,
-    // how many consecutive data is retrieved by BurstRAM
+    // how many consecutive data elements are sent in a burst
 
     parameter RAM_BURST_DATA_BITWIDTH = 64
     // size of data sent in bits, must be divisible by 8 into bytes
@@ -33,17 +33,20 @@ module Cache #(
     // note: the burst size and cache line data must match in size
     //       a burst reads or writes one cache line thus:
     //       RAM_BURST_DATA_COUNT * RAM_BURST_DATA_BITWIDTH / 8 = 
-    //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * INSTRUCTION_BITWIDTH / 8 =
+    //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * DATA_BITWIDTH / 8 =
     //       32 B
 ) (
     input wire clk,
     input wire rst,
+    // port A
+    input wire enA,
     input wire [NUM_COL-1:0] weA,
     input wire [ADDRESS_BITWIDTH-1:0] addrA,
     input wire [DATA_BITWIDTH-1:0] dinA,
     output reg [DATA_BITWIDTH-1:0] doutA,
+    // port B
     input wire [ADDRESS_BITWIDTH-1:0] addrB,
-    output wire [INSTRUCTION_BITWIDTH-1:0] doutB,
+    output wire [DATA_BITWIDTH-1:0] doutB,
     output wire rdyB,
     output wire bsyB,
 
@@ -90,7 +93,6 @@ module Cache #(
 
   localparam NUM_COL = 4;  // 4
   localparam COL_WIDTH = 8;  // 1 byte
-  localparam DATA_BITWIDTH = NUM_COL * COL_WIDTH;  // data width in bits
 
   localparam STATE_PORT_B_IDLE = 4'b0000;
   localparam STATE_PORT_B_WAIT_ICACHE_BUSY = 4'b0010;
