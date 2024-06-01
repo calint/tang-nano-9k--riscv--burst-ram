@@ -128,7 +128,7 @@ module TestBench;
     enable = 0;
 
     while (!data_out_ready) #clk_tk;
-    
+
     if (dut.stat_cache_hits == 2) $display("test 5 passed");
     else $display("test 5 FAILED");
 
@@ -185,12 +185,41 @@ module TestBench;
 
     while (busy) #clk_tk;
 
+    // write 1 byte
+    address = 0;
+    data_in <= 32'h12345678;
+    write_enable_bytes = 4'b0010;  // write 0x56
+    enable = 1;
     #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
+    enable = 0;
 
-    // $display("cache(hits,misses): (%0d,%0d)", dut.stat_cache_hits, dut.stat_cache_misses);
+    while (busy) #clk_tk;
+
+    if (dut.stat_cache_misses == 4) $display("test 12 passed");
+    else $display("test 12 FAILED");
+
+    $finish;
+
+    // read
+    write_enable_bytes = 0;
+    address = 0;
+    enable = 1;
+    #clk_tk;
+    enable = 0;
+
+    while (!data_out_ready) #clk_tk;
+
+    if (instruction == 32'h0A1B563D) $display("test 13 passed");
+    else $display("test 13 FAILED");
+
+    while (busy) #clk_tk;
+
+
+    // some clock ticks at the end
+    #clk_tk;
+    #clk_tk;
+    #clk_tk;
+    #clk_tk;
 
     $finish;
   end

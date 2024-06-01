@@ -204,6 +204,8 @@ module CacheData #(
               $display("CACHE HIT");
 `endif
 
+
+              $display("write_enable_bytes: %0b", write_enable_bytes);
               // write the data depending on which bytes are enabled
               for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
 
@@ -214,11 +216,6 @@ module CacheData #(
                 if (write_enable_bytes[i]) begin
                   cache_line_data[line_ix][data_ix][(i+1)*8-:8] <= data_in[(i+1)*8-:8];
                 end
-
-`ifdef DBG
-                $display("to %0h", cache_line_data[line_ix][data_ix]);
-`endif
-
               end
 
               if (write_enable_bytes == 0) begin
@@ -332,10 +329,17 @@ module CacheData #(
 
             // new cache line fetched
             // write the enabled bytes into the cache line
+            $display("write_enable_bytes: %0b", write_enable_bytes);
+
             for (integer i = 0; i < DATA_SIZE_BYTES; i = i + 1) begin
               if (write_enable_bytes[i]) begin
                 cache_line_data[line_ix][data_ix][(i+1)*8-1-:8] <= data_in[(i+1)*8-:8];
               end
+            end
+
+            if (write_enable_bytes == 0) begin
+              data_out <= cache_line_data[line_ix][data_ix];
+              data_out_ready <= 1;
             end
 
             busy <= 0;
