@@ -6,7 +6,7 @@
 // `define DBG
 `define INFO
 
-module ICache #(
+module CacheInstructions #(
     parameter ADDRESS_BITWIDTH = 32,
     // address space assumed 32 bit
 

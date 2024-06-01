@@ -61,7 +61,7 @@ module Cache #(
     input wire br_busy
 );
 
-  ICache #(
+  CacheInstructions #(
       .ADDRESS_BITWIDTH(ADDRESS_BITWIDTH),
       .LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
       .DATA_BITWIDTH(32),

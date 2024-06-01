@@ -24,10 +24,10 @@ module TestBench;
       .busy(br_busy)
   );
 
-  ICache #(
+  CacheInstructions #(
       .LINE_IX_BITWIDTH(1),  // 2^1 cache lines
       .ADDRESS_BITWIDTH(32),
-      .DATA_BITWIDTH(32), // 4 B per instruction
+      .DATA_BITWIDTH(32),  // 4 B per instruction
       .DATA_IX_IN_LINE_BITWIDTH(3),  // 2^3 32 bit instructions per cache line (32B)
       .RAM_DEPTH_BITWIDTH(4),
       .RAM_BURST_DATA_BITWIDTH(64),
