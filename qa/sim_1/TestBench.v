@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 //
+// SoC (instructions)
+//
 `default_nettype none
 
 module TestBench;

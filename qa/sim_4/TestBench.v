@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 //
+// UartRx
+//
 `default_nettype none
 
 module TestBench;
@@ -40,34 +42,34 @@ module TestBench;
     #clk_tk;
 
     // receive 0b0101_0101 (0x55)
-    uart_rx = 1;  // idle
+    uart_rx <= 1;  // idle
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 0;  // start bit
+    uart_rx <= 0;  // start bit
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;
+    uart_rx <= 1;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 0;
+    uart_rx <= 0;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;
+    uart_rx <= 1;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 0;
+    uart_rx <= 0;
 
     // sample that reg has not changed
     if (dut.regs.mem[11] == 0) $display("test 1 passed");
     else $display("test 1 FAILED");
 
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;
+    uart_rx <= 1;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 0;
+    uart_rx <= 0;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;
+    uart_rx <= 1;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 0;
+    uart_rx <= 0;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;  // stop bit
+    uart_rx <= 1;  // stop bit
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;  // idle
+    uart_rx <= 1;  // idle
 
     // wait until next load register
     #clk_tk;
@@ -77,34 +79,34 @@ module TestBench;
     else $display("test 2 FAILED");
 
     // receive 0b0101_0101 (0x55)
-    uart_rx = 1;  // idle
+    uart_rx <= 1;  // idle
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 0;  // start bit
+    uart_rx <= 0;  // start bit
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;
+    uart_rx <= 1;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 0;
+    uart_rx <= 0;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;
+    uart_rx <= 1;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 0;
+    uart_rx <= 0;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
 
     // sample that register has not changed
     if (dut.regs.mem[11] == 0) $display("test 3 passed");
     else $display("test 3 FAILED");
 
-    uart_rx = 1;
+    uart_rx <= 1;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 0;
+    uart_rx <= 0;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;
+    uart_rx <= 1;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 0;
+    uart_rx <= 0;
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;  // stop bit
+    uart_rx <= 1;  // stop bit
     for (integer i = 0; i < UART_TICKS_PER_BIT; i = i + 1) #clk_tk;
-    uart_rx = 1;  // idle
+    uart_rx <= 1;  // idle
 
     // wait until next load register
     #clk_tk;

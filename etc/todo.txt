@@ -1,9 +1,3 @@
-[x] BurstRAM sim_7 vs sim_9 regarding read delay
-    => non-blocking assignments in test-bench give results as expected in design
-[ ] review sim_x and modify to non-blocking assignments
-[x] BurstRAM write
-[x] BurstRAM when done bursting check if new command and switch
-    state to that instead of 'idle'
 [ ] Cache: if port A gets enabled pause port B
 [ ] ICache: busy->idle state switch skipped if new command?
     if busy 0 can be predicted then a cycle can be saved by sending new command
@@ -14,6 +8,7 @@
 [ ] access value of btn1 and btn2
 [ ] change uart_out, uart_in and leds to #define instead of statics
 [ ] UartTx and UartRx make 'state' from bits instead of enumeration
+[ ] UartTx on posedge clk
 [o] study 'task' and 'function'
 [x]   task: as inlined include
 [ ]   task: with arguments
@@ -28,13 +23,11 @@
 [o]   instructions
 [x]     block ram emulating PSRAM
 [ ]     IP PSRAM
-[ ]   data
-[ ]     block ram emulating PSRAM
+[o]   data
+[x]     block ram emulating PSRAM
 [ ]     IP PSRAM
 [ ] ICache: when burst done check enable and implement start receive in
     that state instead of skipping a cycle
-[x] ICache: how to consolidate the duplicate code in state IDLE and RECV
-    using: task
 [ ] study if 'enable' signal on modules where appropriate would reduce energy requirements
 [ ]   RAM
 [ ] 'reset' signal on modules
@@ -44,6 +37,15 @@
 [ ] similar sample os but in C++23
 [ ] switch to system verilog?
 --------------------------------------------------------------------------
+[x] ICache: how to consolidate the duplicate code in state IDLE and RECV
+    using: task
+[x] BurstRAM sim_7 vs sim_9 regarding read delay
+    => non-blocking assignments in test-bench give results as expected in design
+[x] review sim_x and modify to non-blocking assignments
+    5, 6, 7, 8, 9, 4, 3, 2, 1
+[x] BurstRAM write
+[x] BurstRAM when done bursting check if new command and switch
+    state to that instead of 'idle'
 [x] study if a conditional statement is based on a parameter or localparam gets resolved at compile:
     from Gemini:
     "the if statement using a localparam as a condition  does get resolved at synthesis and can potentially omit or include the content of the if block based on the localparam value."
