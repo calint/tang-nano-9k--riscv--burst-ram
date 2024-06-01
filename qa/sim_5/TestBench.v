@@ -1,7 +1,8 @@
 `timescale 1ns / 1ps
 //
+// BurstRAM
+//
 `default_nettype none
-`define DBG
 
 module TestBench;
   BurstRAM #(

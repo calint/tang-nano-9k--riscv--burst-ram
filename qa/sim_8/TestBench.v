@@ -3,7 +3,6 @@
 // Cache: instruction
 //
 `default_nettype none
-`define DBG
 
 module TestBench;
 

@@ -78,9 +78,24 @@ module BurstRAM #(
                 read_delay_counter <= 0;
                 addr_counter <= addr;
                 state <= STATE_READ_DELAY;
+
+`ifdef DBG
+                $display("BurstRAM memory dump:");
+                $display("---------------------");
+                for (integer i = 0; i < DEPTH; i = i + 1) begin
+                  $display("%0d: %h", i, data[i]);
+                end
+                $display("---------------------");
+`endif
+
               end
               CMD_WRITE: begin
                 data[addr] <= wr_data;
+
+`ifdef DBG
+                $display("BurstRAM[0x%h]=0x%h", addr, wr_data);
+`endif
+
                 addr_counter <= addr + 1;
                 // note: +1 because first write is done in this cycle
                 state <= STATE_WRITE_BURST;
@@ -120,6 +135,11 @@ module BurstRAM #(
             set_new_state_after_command_done;
           end else begin
             data[addr_counter] <= wr_data;
+
+`ifdef DBG
+            $display("BurstRAM[0x%h]=0x%h (2)", addr_counter, wr_data);
+`endif
+
           end
         end
 
@@ -140,6 +160,17 @@ module BurstRAM #(
             read_delay_counter <= 0;
             addr_counter <= addr;
             state <= STATE_READ_DELAY;
+
+`ifdef DBG
+            $display("BurstRAM memory dump (2):");
+            $display("---------------------");
+            for (integer i = 0; i < DEPTH; i = i + 1) begin
+              $display("%0d: %h", i, data[i]);
+            end
+            $display("---------------------");
+`endif
+
+
           end
           CMD_WRITE: begin
             data[addr] <= wr_data;

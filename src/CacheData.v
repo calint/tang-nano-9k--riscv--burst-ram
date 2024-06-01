@@ -1,5 +1,5 @@
 //
-// instruction cache connected to BurstRAM
+// data cache connected to BurstRAM
 //
 
 `default_nettype none
@@ -89,6 +89,11 @@ module CacheData #(
   localparam ADDRESS_LEADING_ZEROS_BITWIDTH = 2;
   // number of leading zeros in the address; assumes 32 bit word aligned access
 
+  localparam BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS = ADDRESS_LEADING_ZEROS_BITWIDTH + $clog2(
+      RAM_BURST_DATA_BITWIDTH / DATA_BITWIDTH
+  );
+  // shift right amount to convert byte address to RAM address
+
   localparam LINE_COUNT = 2 ** LINE_IX_BITWIDTH;
   // number of cache lines
 
@@ -170,6 +175,8 @@ module CacheData #(
     $display("         data ix: %0d bits", DATA_IX_IN_LINE_BITWIDTH);
     $display("  trailing zeros: %0d bits", ADDRESS_LEADING_ZEROS_BITWIDTH);
     $display(" write data mask: %0d bits", RAM_BURST_DATA_BITWIDTH / 8);
+    $display(" ram cache align: %0d bits", CACHE_LINE_ALIGNMENT_BITWIDTH);
+    $display(" byte to ram shf: %0d bits", BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS);
     $display("----------------------------------------");
   end
 `endif
@@ -195,15 +202,14 @@ module CacheData #(
             $display("address: 0x%h  line_ix: %0d  tag: %0h, write: 0b%4b", address, line_ix, tag,
                      write_enable_bytes);
             if (cache_line_valid[line_ix] && cache_line_tag[line_ix] != tag) begin
-              $display("TAG MISMATCH, evict");
+              $display("tag mismatch, evict");
             end
 `endif
 
             if (cache_line_valid[line_ix] && cache_line_tag[line_ix] == tag) begin
 
 `ifdef DBG
-              $display("CACHE HIT");
-              $display("write_enable_bytes: 0b%4b", write_enable_bytes);
+              $display("cache hit");
 `endif
 
               // write the data depending on which bytes are enabled
@@ -225,7 +231,7 @@ module CacheData #(
               end else begin
 
 `ifdef DBG
-                $display("cache line %0d dirty", line_ix);
+                $display("cache line %0d set to dirty", line_ix);
 `endif
 
                 cache_line_dirty[line_ix] <= 1;
@@ -236,34 +242,62 @@ module CacheData #(
             end else begin
 
 `ifdef DBG
-              $display("CACHE MISS");
+              $display("cache miss");
 `endif
 
               stat_cache_misses <= stat_cache_misses + 1;
 
               busy <= 1;
               data_out_ready <= 0;
-              // extract the cache line address from current address
-              br_addr <= address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH];
               br_cmd_en <= 1;
               if (cache_line_dirty[line_ix]) begin
 
 `ifdef DBG
-                $display("dirty");
+                $display("cache line dirty");
 `endif
 
                 // write back cache line then read the new line and set data
+                // extract the cache line address from the tag and line index
+                //  address: [ tag 26b ] [ line index 1b ] [ data index 3b ] [ zero 2b ]
+                // BurstRAM: address >> CACHE_LINE_ALIGNMENT_BITWIDTH (3b)
+                br_addr <= {
+                  cache_line_tag[line_ix],
+                  line_ix,
+                  {DATA_IX_IN_LINE_BITWIDTH{1'b0}},
+                  {ADDRESS_LEADING_ZEROS_BITWIDTH{1'b0}}
+                }>>BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS;
+
+`ifdef DBG
+                $display(
+                    "write line to BurstRAM address: 0x%h",
+                    {cache_line_tag[line_ix], line_ix, {DATA_IX_IN_LINE_BITWIDTH{1'b0}}, {ADDRESS_LEADING_ZEROS_BITWIDTH{1'b0}}} >> BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS);
+`endif
+
+
                 br_cmd <= 1;  // write
                 for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
                   br_wr_data[(i+1)*DATA_BITWIDTH-1-:DATA_BITWIDTH] <= cache_line_data[line_ix][i];
+
+`ifdef DBG
+                  $display("write data %0d: %h", i, cache_line_data[line_ix][i]);
+`endif
+
                 end
-                burst_counter <= 0;
+                burst_counter <= 0;  // first payload will have been sent
                 burst_data_ix <= DATA_PER_RAM_DATA;  // skip the first payload
                 state <= STATE_WRITE_LINE;
               end else begin
 
 `ifdef DBG
-                $display("not dirty");
+                $display("cache line not dirty");
+`endif
+
+                // extract the cache line address from current address
+                br_addr <= address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH];
+
+`ifdef DBG
+                $display("read line from BurstRAM address: 0x%h",
+                         address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH]);
 `endif
 
                 // cache line not dirty; read cache line and set data
@@ -308,13 +342,30 @@ module CacheData #(
             burst_counter <= 0;
             burst_data_ix <= 0;
             // after write back is done read the line and then set the data
+            br_addr <= address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH];
             br_cmd <= 0;  // read
             br_cmd_en <= 1;
+            // set the cache line tag to the new address
+            cache_line_tag[line_ix] <= tag;
+            cache_line_valid[line_ix] <= 1;
+            cache_line_dirty[line_ix] <= 0;
+
+`ifdef DBG
+            $display("read line from BurstRAM address (1): 0x%h",
+                     address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH]);
+`endif
+
             state <= STATE_WRITE_FETCH_LINE;
           end else begin
+            // write next data from cache line
             for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
               br_wr_data[(i+1)*DATA_BITWIDTH-1 -:DATA_BITWIDTH] 
                 <= cache_line_data[line_ix][burst_data_ix + i];
+
+`ifdef DBG
+              $display("write data %0d: %0h", i, cache_line_data[line_ix][burst_data_ix+i]);
+`endif
+
             end
             burst_data_ix <= burst_data_ix + DATA_PER_RAM_DATA;
             burst_counter <= burst_counter + 1;
@@ -338,11 +389,6 @@ module CacheData #(
 
             // new cache line has been fetched
             // write the enabled bytes into the cache line
-
-`ifdef DBG
-            $display("write_enable_bytes: 0b%4b", write_enable_bytes);
-`endif
-
             for (integer i = 0; i < DATA_SIZE_BYTES; i = i + 1) begin
               if (write_enable_bytes[i]) begin
                 cache_line_data[line_ix][data_ix][(i+1)*8-1-:8] <= data_in[(i+1)*8-1-:8];
@@ -355,7 +401,7 @@ module CacheData #(
             end else begin
 
 `ifdef DBG
-              $display("cache line %0d dirty", line_ix);
+              $display("set cache line %0d dirty", line_ix);
 `endif
 
               cache_line_dirty[line_ix] <= 1;

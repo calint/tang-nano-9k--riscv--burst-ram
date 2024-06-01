@@ -1,18 +1,18 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Sat Jun  1 11:46:13 2024
+[*] Sat Jun  1 15:42:49 2024
 [*]
 [dumpfile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_9/log.vcd"
-[dumpfile_mtime] "Sat Jun  1 11:36:14 2024"
-[dumpfile_size] 8005712
+[dumpfile_mtime] "Sat Jun  1 15:39:39 2024"
+[dumpfile_size] 14743593
 [savefile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_9/log.gtkw"
-[timestart] 268600
+[timestart] 0
 [size] 1910 1024
 [pos] -1 -1
-*-16.038031 465000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-15.497989 25000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TestBench.
 [sst_width] 269
-[signals_width] 214
+[signals_width] 300
 [sst_expanded] 1
 [sst_vpaned_height] 304
 @28
@@ -22,14 +22,17 @@ TestBench.clk
 TestBench.write_enable_bytes[3:0]
 @22
 TestBench.data_in[31:0]
+[color] 5
 TestBench.address[31:0]
 @28
-TestBench.busy
 TestBench.data_out_ready
 @22
 TestBench.instruction[31:0]
 @28
 TestBench.dut.state[6:0]
+[color] 2
+TestBench.busy
+[color] 4
 TestBench.br_rd_data_valid
 @24
 TestBench.dut.burst_counter[1:0]
@@ -38,8 +41,14 @@ TestBench.br_cmd_en
 @24
 TestBench.br_cmd
 @28
+TestBench.dut.br_busy
+TestBench.dut.br_rd_data_valid
+@22
+TestBench.dut.br_addr[3:0]
+TestBench.dut.br_rd_data[63:0]
+TestBench.dut.br_wr_data[63:0]
+@24
 TestBench.burst_ram.state[2:0]
-@25
 TestBench.burst_ram.burst_counter[1:0]
 [pattern_trace] 1
 [pattern_trace] 0

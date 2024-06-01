@@ -3,7 +3,6 @@
 // BurstRAM
 //
 `default_nettype none
-`define DBG
 
 module TestBench;
   BurstRAM #(
