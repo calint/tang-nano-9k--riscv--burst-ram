@@ -1,40 +1,13 @@
-//
-// instructions and data RAM
-// port A: read / write 32 bit data
-// port B: read-only 32 bit instruction
-//
-
 `default_nettype none
-// `define DBG
 
 module Cache #(
     parameter ADDRESS_BITWIDTH = 32,
-    // 2 ^ 32 addressable bytes
-
     parameter DATA_BITWIDTH = 32,
-    // size of data; must be divisble by 8
-
     parameter CACHE_LINE_IX_BITWIDTH = 1,
-    // 2 ^ 1 = 2 cache lines
-
     parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
-    // 2 ^ 3 = 8 data per cache line
-
     parameter RAM_DEPTH_BITWIDTH = 4,
-    // 2 ^ 4 = 16 RAM entries of size RAM_BURST_DATA_BITWIDTH
-    // note: must be same as specified to BurstRAM
-
     parameter RAM_BURST_DATA_COUNT = 4,
-    // how many consecutive data elements are sent in a burst
-
     parameter RAM_BURST_DATA_BITWIDTH = 64
-    // size of data sent in bits, must be divisible by 8 into bytes
-    // RAM reads 4 * 8 = 32 B per burst
-    // note: the burst size and cache line data must match in size
-    //       a burst reads or writes one cache line thus:
-    //       RAM_BURST_DATA_COUNT * RAM_BURST_DATA_BITWIDTH / 8 = 
-    //       2 ^ CACHE_IX_IN_LINE_BITWIDTH * DATA_BITWIDTH / 8 =
-    //       32 B
 ) (
     input wire clk,
     input wire rst,
@@ -61,6 +34,7 @@ module Cache #(
     input wire br_busy
 );
 
+  // port A
   CacheInstructions #(
       .ADDRESS_BITWIDTH(ADDRESS_BITWIDTH),
       .DATA_BITWIDTH(32),
@@ -69,7 +43,6 @@ module Cache #(
       .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
       .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH),
       .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT)
-      // .ADDRESS_LEADING_ZEROS_BITWIDTH(2)
   ) icache (
       .clk(clk),
       .rst(rst),
@@ -80,14 +53,15 @@ module Cache #(
       .busy(bsyB),
 
       // -- wiring to BurstRAM (prefix br_) -- -- -- -- -- --
-      .br_cmd(br_cmd),
-      .br_cmd_en(br_cmd_en),
-      .br_addr(br_addr),
+      .br_cmd(icache_br_cmd),
+      .br_cmd_en(icache_br_cmd_en),
+      .br_addr(icache_br_addr),
       .br_rd_data(br_rd_data),
       .br_rd_data_valid(br_rd_data_valid),
       .br_busy(br_busy)
   );
 
+  // port B
   CacheData #(
       .ADDRESS_BITWIDTH(ADDRESS_BITWIDTH),
       .DATA_BITWIDTH(32),
@@ -110,44 +84,52 @@ module Cache #(
       .data_in(dinA),
 
       // -- wiring to BurstRAM (prefix br_) -- -- -- -- -- --
-      .br_cmd(br_cmd),
-      .br_cmd_en(br_cmd_en),
-      .br_addr(br_addr),
+      .br_cmd(dcache_br_cmd),
+      .br_cmd_en(dcache_br_cmd_en),
+      .br_addr(dcache_br_addr),
       .br_rd_data(br_rd_data),
       .br_rd_data_valid(br_rd_data_valid),
-      .br_wr_data(br_wr_data),
-      .br_data_mask(br_data_mask),
+      .br_wr_data(dcache_br_wr_data),
+      .br_data_mask(dcache_br_data_mask),
       .br_busy(br_busy)
-      // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
   );
 
-  reg icache_br_cmd;
-  reg icache_br_cmd_en;
-  reg [ADDRESS_BITWIDTH-1:0] icache_br_addr;
-
-  reg dcache_br_cmd;
-  reg dcache_br_cmd_en;
-  reg [ADDRESS_BITWIDTH-1:0] dcache_br_addr;
-  reg dcache_enable;
-
+  // Control signals for multiplexer
   reg icache_enable;
+  reg dcache_enable;
 
   reg dcache_command;
   wire dcache_data_out_ready;
   wire dcache_busy;
-  reg [DATA_BITWIDTH-1:0] din;
 
+  // Intermediate signals for BurstRAM
+  wire icache_br_cmd;
+  wire icache_br_cmd_en;
+  wire [RAM_DEPTH_BITWIDTH-1:0] icache_br_addr;
+  wire [RAM_BURST_DATA_BITWIDTH-1:0] icache_br_wr_data;
+  wire [RAM_BURST_DATA_BITWIDTH/8-1:0] icache_br_data_mask;
+
+  wire dcache_br_cmd;
+  wire dcache_br_cmd_en;
+  wire [RAM_DEPTH_BITWIDTH-1:0] dcache_br_addr;
+  wire [RAM_BURST_DATA_BITWIDTH-1:0] dcache_br_wr_data;
+  wire [RAM_BURST_DATA_BITWIDTH/8-1:0] dcache_br_data_mask;
+
+  // Multiplexer logic for shared BurstRAM resource
   assign br_cmd = icache_enable ? icache_br_cmd : dcache_br_cmd;
   assign br_cmd_en = icache_enable ? icache_br_cmd_en : dcache_br_cmd_en;
   assign br_addr = icache_enable ? icache_br_addr : dcache_br_addr;
+  assign br_wr_data = icache_enable ? icache_br_wr_data : dcache_br_wr_data;
+  assign br_data_mask = icache_enable ? icache_br_data_mask : dcache_br_data_mask;
 
-
-  always @(posedge clk) begin
-    icache_br_cmd_en <= 1;
-    icache_enable <= 1;
+  // Control logic to enable either icache or dcache
+  always @(posedge clk or posedge rst) begin
+    if (rst) begin
+      icache_enable <= 1;
+      dcache_enable <= 0;
+    end
   end
 
 endmodule
 
-`undef DBG
 `default_nettype wire
