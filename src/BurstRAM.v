@@ -49,9 +49,10 @@ module BurstRAM #(
     $display("----------------------------------------");
     $display("  BurstRAM");
     $display("----------------------------------------");
-    $display("      size: %0d B", DEPTH * DATA_BITWIDTH / 8);
-    $display("     depth: %0d", DEPTH);
-    $display(" data size: %0d bits", DATA_BITWIDTH);
+    $display("         size: %0d B", DEPTH * DATA_BITWIDTH / 8);
+    $display("        depth: %0d", DEPTH);
+    $display("    data size: %0d bits", DATA_BITWIDTH);
+    $display(" read latency: %0d cycles", CYCLES_BEFORE_DATA_READY);
     $display("----------------------------------------");
 `endif
 

@@ -1,3 +1,4 @@
+[ ] BurstRAM simulation vs sim_9 regarding read delay
 [x] BurstRAM write
 [x] BurstRAM when done bursting check if new command and switch
     state to that instead of 'idle'

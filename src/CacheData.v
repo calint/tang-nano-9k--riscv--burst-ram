@@ -31,8 +31,11 @@ module CacheData #(
     //       32 B
     // RAM reads 4 * 8 = 32 B per burst
 
-    parameter RAM_DEPTH_BITWIDTH = 8
+    parameter RAM_DEPTH_BITWIDTH = 8,
     // size of RAM: 2 ^ RAM_DEPTH_BITWIDTH * RAM_BURST_DATA_BITWIDTH / 8 = 2 KB
+
+    parameter ADDRESS_LEADING_ZEROS_BITWIDTH = 2
+    // addresses accessed have leading 2 zeros; e.g. 0xabcdef00
 ) (
     input wire clk,  // RAM clock
 
@@ -56,6 +59,7 @@ module CacheData #(
     output reg busy,
     // asserted while busy
     // note: data_out_ready may be asserted while busy is asserted
+    //       if burst ram transaction not complete
 
     input wire [DATA_BITWIDTH/8-1:0] write_enable_bytes,
 
@@ -85,9 +89,6 @@ module CacheData #(
   localparam DATA_PER_RAM_DATA = RAM_BURST_DATA_BITWIDTH / DATA_BITWIDTH;
   // number of data elements per RAM data retrieved, must be evenly divisible
   // note: RAM may have bigger data such as 64 bit when data is 32 bit
-
-  localparam ADDRESS_LEADING_ZEROS_BITWIDTH = 2;
-  // number of leading zeros in the address; assumes 32 bit word aligned access
 
   localparam BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS = ADDRESS_LEADING_ZEROS_BITWIDTH + $clog2(
       RAM_BURST_DATA_BITWIDTH / DATA_BITWIDTH
@@ -201,9 +202,6 @@ module CacheData #(
 `ifdef DBG
             $display("address: 0x%h  line_ix: %0d  tag: %0h, write: 0b%4b", address, line_ix, tag,
                      write_enable_bytes);
-            if (cache_line_valid[line_ix] && cache_line_tag[line_ix] != tag) begin
-              $display("tag mismatch, evict");
-            end
 `endif
 
             if (cache_line_valid[line_ix] && cache_line_tag[line_ix] == tag) begin
@@ -239,10 +237,19 @@ module CacheData #(
 
               busy <= 0;
               stat_cache_hits <= stat_cache_hits + 1;
-            end else begin
+
+            end else begin  // not (cache_line_valid[line_ix] && cache_line_tag[line_ix] == tag)
 
 `ifdef DBG
               $display("cache miss");
+              if (cache_line_valid[line_ix]) begin
+                $display("cache line valid");
+              end else begin
+                $display("cache line invalid");
+              end
+              if (cache_line_valid[line_ix] && cache_line_tag[line_ix] != tag) begin
+                $display("tag mismatch, evict");
+              end
 `endif
 
               stat_cache_misses <= stat_cache_misses + 1;
@@ -286,7 +293,8 @@ module CacheData #(
                 burst_counter <= 0;  // first payload will have been sent
                 burst_data_ix <= DATA_PER_RAM_DATA;  // skip the first payload
                 state <= STATE_WRITE_LINE;
-              end else begin
+
+              end else begin  // not (cache_line_dirty[line_ix]) 
 
 `ifdef DBG
                 $display("cache line not dirty");
@@ -351,7 +359,7 @@ module CacheData #(
             cache_line_dirty[line_ix] <= 0;
 
 `ifdef DBG
-            $display("read line from BurstRAM address (1): 0x%h",
+            $display("read line from BurstRAM address: 0x%h",
                      address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH]);
 `endif
 
