@@ -1,6 +1,7 @@
 [x] BurstRAM write
 [x] BurstRAM when done bursting check if new command and switch
     state to that instead of 'idle'
+[ ] Cache: if port A gets enabled pause port B
 [ ] ICache: busy->idle state switch skipped if new command?
     if busy 0 can be predicted then a cycle can be saved by sending new command
     before entering 'idle' state

@@ -8,9 +8,10 @@
 
 module ICache #(
     parameter ADDRESS_BITWIDTH = 32,
+    // address space assumed 32 bit
 
     parameter DATA_BITWIDTH = 32,
-    // size of a data in cache line, must be divisble by 8
+    // size of a data element stored in cache line, must be divisible by 8
 
     parameter DATA_IX_IN_LINE_BITWIDTH = 3,
     // 2 ^ 3 = 8 data per cache line
@@ -19,38 +20,39 @@ module ICache #(
     // 2 ^ 1 = 2 cache lines
 
     parameter RAM_BURST_DATA_COUNT = 4,
-    // how many consecutive datas are retrieved in a burst
+    // consecutive data elements retrieved in a burst
 
     parameter RAM_BURST_DATA_BITWIDTH = 64,
-    // size of data sent in bits, must be divisible by 8 into bytes
-    // RAM reads 4 * 8 = 32 B per burst
-    // note: the burst size and cache line data must match in size
+    // size of data sent by RAM in bits, must be divisible by 8 into bytes
+    // note: the burst size and cache line size must match
     //       a burst reads or writes one cache line thus:
     //       RAM_BURST_DATA_COUNT * RAM_BURST_DATA_BITWIDTH = 
     //       2 ^ DATA_IX_IN_LINE_BITWIDTH * DATA_BITWIDTH =
     //       32 B
+    // RAM reads 4 * 8 = 32 B per burst
 
-    parameter RAM_DEPTH_BITWIDTH = 4
-    // size of RAM: 4 ^ RAM_DEPTH_BITWIDTH * RAM_BURST_DATA_BITWIDTH
+    parameter RAM_DEPTH_BITWIDTH = 8
+    // size of RAM: 2 ^ RAM_DEPTH_BITWIDTH * RAM_BURST_DATA_BITWIDTH / 8 = 2 KB
 ) (
     input wire clk,  // RAM clock
 
     input wire rst,  // reset
 
-    input wire enable,  // assert to request data, busy must be low
+    input wire enable,
+    // assert to request data, busy must not be asserted or the signal is ignored
 
     input wire [ADDRESS_BITWIDTH-1:0] address,
-    // address in bytes, 4 byte word aligned with bottom 2 bits 0
+    // address in bytes, 4 byte words aligned with bottom 2 bits being 0
 
     output reg [DATA_BITWIDTH-1:0] data,
-    // the cached element
+    // the cached data of the address
 
     output reg data_ready,
-    // instruction retrieved and valid
+    // data retrieved and valid
 
     output reg busy,
     // asserted while busy
-    // note: data_ready may be asserted before busy is deasserted
+    // note: data_ready may be asserted while busy is asserted
 
     // -- wiring to BurstRAM (prefix br_) -- -- -- -- -- --
     output reg br_cmd,
@@ -64,19 +66,21 @@ module ICache #(
     // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 );
 
-  localparam RAM_ALIGNMENT_BITWIDTH = $clog2(RAM_BURST_DATA_BITWIDTH / 8);
-
   localparam DATA_SIZE_BYTES = DATA_BITWIDTH / 8;
-
-  localparam DATA_PER_RAM_DATA = RAM_BURST_DATA_BITWIDTH / DATA_BITWIDTH;
-  // number of data elements per RAM data, must be evenly divisible
-  // note: RAM may have bigger data such as 64 bit when data is 32 bit
-
-  localparam ADDRESS_LEADING_ZEROS_BITWIDTH = 2;
-  // number of leading zeros in the address; assumes 32 bit word aligned so 2
 
   localparam DATA_PER_LINE = 2 ** DATA_IX_IN_LINE_BITWIDTH;
   // number of data per cache line
+
+  localparam RAM_ALIGNMENT_BITWIDTH = $clog2(DATA_PER_LINE);
+  // the lower bits ignored when addressing a cache line in RAM
+  // note: data stored in ram is RAM_BURST_DATA_BITWIDTH
+
+  localparam DATA_PER_RAM_DATA = RAM_BURST_DATA_BITWIDTH / DATA_BITWIDTH;
+  // number of data elements per RAM data retrieved, must be evenly divisible
+  // note: RAM may have bigger data such as 64 bit when data is 32 bit
+
+  localparam ADDRESS_LEADING_ZEROS_BITWIDTH = 2;
+  // number of leading zeros in the address; assumes 32 bit word aligned access
 
   localparam LINE_COUNT = 2 ** LINE_IX_BITWIDTH;
   // number of cache lines
@@ -111,7 +115,9 @@ module ICache #(
   reg [DATA_IX_IN_LINE_BITWIDTH-1:0] burst_data_ix;
   // counter of which index in the cache line to update
 
+  //
   // stats
+  //
   reg [63:0] stat_cache_hits;
   reg [63:0] stat_cache_misses;
 
@@ -142,6 +148,9 @@ module ICache #(
     $display("           lines: %0d", LINE_COUNT);
     $display("   data per line: %0d", DATA_PER_LINE);
     $display("       data size: %0d bits", DATA_BITWIDTH);
+    $display("     total usage: %0d B",
+             DATA_PER_LINE * DATA_SIZE_BYTES * LINE_COUNT + (TAG_BITWIDTH + 1) * LINE_COUNT / 8);
+    // note: 1 is valid bit and 8 is bits per byte
     $display("             tag: %0d bits", TAG_BITWIDTH);
     $display("         line ix: %0d bits", LINE_IX_BITWIDTH);
     $display("         data ix: %0d bits", DATA_IX_IN_LINE_BITWIDTH);
