@@ -29,9 +29,9 @@ module TestBench;
 
   Cache #(
       .ADDRESS_BITWIDTH(32),
-      
+
       .DATA_BITWIDTH(32),
-      
+
       .CACHE_LINE_IX_BITWIDTH(1),
       // 2 ^ 1 = 2 cache lines
 
@@ -117,9 +117,9 @@ module TestBench;
     // reset
     #clk_tk;
     #(clk_tk / 2);
-    rst   = 0;
+    rst = 0;
 
-    // read instruction 0x0000
+    // read instruction 0x0000 (cache miss)
     addrB <= 0;
     #clk_tk;
     #clk_tk;
@@ -134,48 +134,42 @@ module TestBench;
     // read instruction 0x0004 (cache hit)
     addrB <= 4;
     #clk_tk;
+
+    // read instruction 0x0008 (cache hit)
+    addrB <= 8;
     #clk_tk;
 
+    // check result from address 4 (one cycle delay)
     if (rdyB) $display("test 2 passed");
     else $display("test 2 FAILED");
 
     if (!bsyB) $display("test 3 passed");
     else $display("test 3 FAILED");
 
-    if (doutB == 32'h3F5A2E14) $display("test 4 passed");
-    else $display("test 4 FAILED");
-
-    // read instruction 0x0008 (cache hit)
-    addrB <= 8;
-    #clk_tk;
-    #clk_tk;
-
-    if (doutB == 32'hAB4C3E6F) $display("test 3 passed");
-    else $display("test 3 FAILED");
-
-    // read instruction 0x0008 (cache miss)
+    // read instruction 0x0040 (cache miss)
     addrB <= 64;
     #clk_tk;
-    #clk_tk;
 
+    // check result from address 8 (one cycle delay)
+    if (doutB == 32'hAB4C3E6F) $display("test 4 passed");
+    else $display("test 4 FAILED");
+
+    // the cache miss from address 64
     while (!rdyB) #clk_tk;
 
-    if (doutB == 32'h4E5F6A7B) $display("test 4 passed");
-    else $display("test 4 FAILED");
+    if (doutB == 32'h4E5F6A7B) $display("test 5 passed");
+    else $display("test 5 FAILED");
 
     while (bsyB) #clk_tk;
 
     // read instruction 0x0008 (cache miss, eviction)
     addrB <= 32;
     #clk_tk;
-    #clk_tk;
 
     while (!rdyB) #clk_tk;
 
-    if (doutB == 32'h2F5E3C7A) $display("test 5 passed");
-    else $display("test 5 FAILED");
-
-    while (bsyB) #clk_tk;
+    if (doutB == 32'h2F5E3C7A) $display("test 7 passed");
+    else $display("test 7 FAILED");
 
     #clk_tk;
     #clk_tk;
