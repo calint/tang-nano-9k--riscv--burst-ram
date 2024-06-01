@@ -120,7 +120,7 @@ module TestBench;
     rst   = 0;
 
     // read instruction 0x0000
-    addrB = 0;
+    addrB <= 0;
     #clk_tk;
     #clk_tk;
 
@@ -132,7 +132,7 @@ module TestBench;
     while (bsyB) #clk_tk;
 
     // read instruction 0x0004 (cache hit)
-    addrB = 4;
+    addrB <= 4;
     #clk_tk;
     #clk_tk;
 
@@ -146,7 +146,7 @@ module TestBench;
     else $display("test 4 FAILED");
 
     // read instruction 0x0008 (cache hit)
-    addrB = 8;
+    addrB <= 8;
     #clk_tk;
     #clk_tk;
 
@@ -154,7 +154,7 @@ module TestBench;
     else $display("test 3 FAILED");
 
     // read instruction 0x0008 (cache miss)
-    addrB = 64;
+    addrB <= 64;
     #clk_tk;
     #clk_tk;
 
@@ -166,7 +166,7 @@ module TestBench;
     while (bsyB) #clk_tk;
 
     // read instruction 0x0008 (cache miss, eviction)
-    addrB = 32;
+    addrB <= 32;
     #clk_tk;
     #clk_tk;
 

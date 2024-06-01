@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 //
-// BurstRAM
+// BurstRAM read/write
 //
 `default_nettype none
 
@@ -48,65 +48,65 @@ module TestBench;
     rst = 0;
 
     // write to 0x0000
-    cmd_en = 1;
-    cmd = 1; // write
-    addr = 0;
-    wr_data = 64'h3F5A2E14B7C6A980;
+    cmd_en <= 1;
+    cmd <= 1; // write
+    addr <= 0;
+    wr_data <= 64'h3F5A2E14B7C6A980;
     #clk_tk;
-    cmd_en = 0; // note: can be disabled
-    cmd = 0; // note: can be disabled
-    wr_data = 64'h9D8E2F17AB4C3E6F;
+    cmd_en <= 0; // note: can be disabled
+    cmd <= 0; // note: can be disabled
+    wr_data <= 64'h9D8E2F17AB4C3E6F;
     #clk_tk;
-    wr_data = 64'hA1C3F7E2D5B8A9C4;
+    wr_data <= 64'hA1C3F7E2D5B8A9C4;
     #clk_tk;
-    wr_data = 64'h7D4E9F2C1B6A3D8F;
+    wr_data <= 64'h7D4E9F2C1B6A3D8F;
     #clk_tk;
 
     // test busy
     #clk_tk;
 
-    if (!busy) $display("test 1 passed");
+    if (busy) $display("test 1 passed");
     else $display("test 1 FAILED");
 
     // test writing knowing when busy if false
 
     // write to 0x0020
-    cmd_en = 1;
-    cmd = 1; // write
-    addr = 32 / 8; // 8 bytes words
-    wr_data = 64'h6C4B9A8D2F5E3C7A;
+    cmd_en <= 1;
+    cmd <= 1; // write
+    addr <= 32 / 8; // 8 bytes words
+    wr_data <= 64'h6C4B9A8D2F5E3C7A;
     #clk_tk;
-    cmd_en = 0; // note: can be disabled
-    cmd = 0; // note: can be disabled
-    wr_data = 64'hE1A7D0B5C8F3E6A9;
+    cmd_en <= 0; // note: can be disabled
+    cmd <= 0; // note: can be disabled
+    wr_data <= 64'hE1A7D0B5C8F3E6A9;
     #clk_tk;
-    wr_data = 64'hF8E9D2C3B4A5F6E7;
+    wr_data <= 64'hF8E9D2C3B4A5F6E7;
     #clk_tk;
-    wr_data = 64'hD4E7F2C5B8A3D6E9;
+    wr_data <= 64'hD4E7F2C5B8A3D6E9;
     #clk_tk;
 
     // write to 0x0000
-    cmd_en = 1;
-    cmd = 1; // write
-    addr = 0;
-    wr_data = 64'h3F5A2E14B7C6A980;
+    cmd_en <= 1;
+    cmd <= 1; // write
+    addr <= 0;
+    wr_data <= 64'h3F5A2E14B7C6A980;
     #clk_tk;
-    cmd_en = 0; // note: can be disabled
-    cmd = 0; // note: can be disabled
-    wr_data = 64'h9D8E2F17AB4C3E6F;
+    cmd_en <= 0; // note: can be disabled
+    cmd <= 0; // note: can be disabled
+    wr_data <= 64'h9D8E2F17AB4C3E6F;
     #clk_tk;
-    wr_data = 64'hA1C3F7E2D5B8A9C4;
+    wr_data <= 64'hA1C3F7E2D5B8A9C4;
     #clk_tk;
-    wr_data = 64'h7D4E9F2C1B6A3D8F;
+    wr_data <= 64'h7D4E9F2C1B6A3D8F;
     #clk_tk;
 
     // read 0x0000
-    cmd_en = 1;
-    cmd = 0;
-    addr = 0;
+    cmd_en <= 1;
+    cmd <= 0;
+    addr <= 0;
     #clk_tk;
-    cmd_en = 0; // note: can be disable
-    cmd = 0; // note: can be disabled
+    cmd_en <= 0; // note: can be disable
+    cmd <= 0; // note: can be disabled
     #clk_tk;
 
     // delay before burst (DELAY_BEFORE_RD_DATA_AVAILABLE)
@@ -116,44 +116,44 @@ module TestBench;
     #clk_tk;
 
     // check data ready
-    if (rd_data_valid) $display("test 1 passed");
-    else $display("test 1 FAILED");
-
-    // first data
-    if (rd_data == 64'h3F5A2E14B7C6A980) $display("test 2 passed");
+    if (rd_data_valid) $display("test 2 passed");
     else $display("test 2 FAILED");
 
-    #clk_tk;
-
-    // second data
-    if (rd_data == 64'h9D8E2F17AB4C3E6F) $display("test 3 passed");
+    // first data
+    if (rd_data == 64'h3F5A2E14B7C6A980) $display("test 3 passed");
     else $display("test 3 FAILED");
 
     #clk_tk;
 
-    // third data
-    if (rd_data == 64'hA1C3F7E2D5B8A9C4) $display("test 4 passed");
+    // second data
+    if (rd_data == 64'h9D8E2F17AB4C3E6F) $display("test 4 passed");
     else $display("test 4 FAILED");
 
     #clk_tk;
 
-    // fourth data
-    if (rd_data == 64'h7D4E9F2C1B6A3D8F) $display("test 5 passed");
+    // third data
+    if (rd_data == 64'hA1C3F7E2D5B8A9C4) $display("test 5 passed");
     else $display("test 5 FAILED");
 
     #clk_tk;
 
-    // check data ready
-    if (!rd_data_valid) $display("test 6 passed");
+    // fourth data
+    if (rd_data == 64'h7D4E9F2C1B6A3D8F) $display("test 6 passed");
     else $display("test 6 FAILED");
 
-    // read 0x0020
-    cmd_en = 1;
-    cmd = 0;
-    addr = 32 / 8;  // 8 bytes words
     #clk_tk;
-    cmd_en = 0; // note: can be disable
-    cmd = 0; // note: can be disabled
+
+    // check data ready
+    if (!rd_data_valid) $display("test 7 passed");
+    else $display("test 7 FAILED");
+
+    // read 0x0020
+    cmd_en <= 1;
+    cmd <= 0;
+    addr <= 32 / 8;  // 8 bytes words
+    #clk_tk;
+    cmd_en <= 0; // note: can be disable
+    cmd <= 0; // note: can be disabled
     #clk_tk;
 
     // delay before burst (DELAY_BEFORE_RD_DATA_AVAILABLE)
@@ -163,38 +163,38 @@ module TestBench;
     #clk_tk;
 
     // check data ready
-    if (rd_data_valid) $display("test 7 passed");
-    else $display("test 7 FAILED");
-
-    // first data
-    if (rd_data == 64'h6C4B9A8D2F5E3C7A) $display("test 8 passed");
+    if (rd_data_valid) $display("test 8 passed");
     else $display("test 8 FAILED");
 
-    #clk_tk;
-
-    // second data
-    if (rd_data == 64'hE1A7D0B5C8F3E6A9) $display("test 9 passed");
+    // first data
+    if (rd_data == 64'h6C4B9A8D2F5E3C7A) $display("test 9 passed");
     else $display("test 9 FAILED");
 
     #clk_tk;
 
-    // third data
-    if (rd_data == 64'hF8E9D2C3B4A5F6E7) $display("test 10 passed");
+    // second data
+    if (rd_data == 64'hE1A7D0B5C8F3E6A9) $display("test 10 passed");
     else $display("test 10 FAILED");
 
     #clk_tk;
 
-    // fourth data
-    if (rd_data == 64'hD4E7F2C5B8A3D6E9) $display("test 11 passed");
+    // third data
+    if (rd_data == 64'hF8E9D2C3B4A5F6E7) $display("test 11 passed");
     else $display("test 11 FAILED");
 
-    // read 0x0000
-    cmd_en = 1;
-    cmd = 0;
-    addr = 0;
     #clk_tk;
-    cmd_en = 0; // note: can be disable
-    cmd = 0; // note: can be disabled
+
+    // fourth data
+    if (rd_data == 64'hD4E7F2C5B8A3D6E9) $display("test 12 passed");
+    else $display("test 12 FAILED");
+
+    // read 0x0000
+    cmd_en <= 1;
+    cmd <= 0;
+    addr <= 0;
+    #clk_tk;
+    cmd_en <= 0; // note: can be disable
+    cmd <= 0; // note: can be disabled
     #clk_tk;
 
     // delay before burst (DELAY_BEFORE_RD_DATA_AVAILABLE)
@@ -204,30 +204,30 @@ module TestBench;
     #clk_tk;
 
     // check data ready
-    if (rd_data_valid) $display("test 12 passed");
-    else $display("test 12 FAILED");
-
-    // first data
-    if (rd_data == 64'h3F5A2E14B7C6A980) $display("test 13 passed");
+    if (rd_data_valid) $display("test 13 passed");
     else $display("test 13 FAILED");
 
-    #clk_tk;
-
-    // second data
-    if (rd_data == 64'h9D8E2F17AB4C3E6F) $display("test 14 passed");
+    // first data
+    if (rd_data == 64'h3F5A2E14B7C6A980) $display("test 14 passed");
     else $display("test 14 FAILED");
 
     #clk_tk;
 
-    // third data
-    if (rd_data == 64'hA1C3F7E2D5B8A9C4) $display("test 15 passed");
+    // second data
+    if (rd_data == 64'h9D8E2F17AB4C3E6F) $display("test 15 passed");
     else $display("test 15 FAILED");
 
     #clk_tk;
 
-    // fourth data
-    if (rd_data == 64'h7D4E9F2C1B6A3D8F) $display("test 16 passed");
+    // third data
+    if (rd_data == 64'hA1C3F7E2D5B8A9C4) $display("test 16 passed");
     else $display("test 16 FAILED");
+
+    #clk_tk;
+
+    // fourth data
+    if (rd_data == 64'h7D4E9F2C1B6A3D8F) $display("test 17 passed");
+    else $display("test 17 FAILED");
 
     // some waits at the ends
     #clk_tk;

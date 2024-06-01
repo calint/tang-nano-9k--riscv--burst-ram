@@ -1,4 +1,6 @@
-[ ] BurstRAM simulation vs sim_9 regarding read delay
+[x] BurstRAM sim_7 vs sim_9 regarding read delay
+    => non-blocking assignments in test-bench give results as expected in design
+[ ] review sim_x and modify to non-blocking assignments
 [x] BurstRAM write
 [x] BurstRAM when done bursting check if new command and switch
     state to that instead of 'idle'

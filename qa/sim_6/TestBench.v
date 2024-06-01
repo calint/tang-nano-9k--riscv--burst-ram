@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 //
+// CacheInstructions
+//
 `default_nettype none
 
 module TestBench;
@@ -84,10 +86,10 @@ module TestBench;
     rst = 0;
 
     // cache miss
-    address = 0;
-    enable = 1;
+    address <= 0;
+    enable  <= 1;
     #clk_tk;
-    enable = 0;
+    enable <= 0;
 
     while (!data_ready) #clk_tk;
 
@@ -97,63 +99,57 @@ module TestBench;
     if (instruction == 32'hB7C6A980) $display("test 2 passed");
     else $display("test 2 FAILED");
 
-    // note: data may be ready before cache is finished retrieving data
+    // note: data may be ready before BurstRAM transaction is finished
     while (busy) #clk_tk;
 
     // cache hit
-    address = 4;
-    enable  = 1;
+    address <= 4;
+    enable  <= 1;
     #clk_tk;
-    enable = 0;
+    enable  <= 0;
 
-    while (!data_ready) #clk_tk;
+    // cache hit
+    address <= 8;
+    enable  <= 1;
+    #clk_tk;
+    enable <= 0;
 
+    // checking result from address 4 (one cycle delay from cache)
     if (dut.stat_cache_hits == 1) $display("test 3 passed");
     else $display("test 3 FAILED");
 
     if (instruction == 32'h3F5A2E14) $display("test 4 passed");
     else $display("test 4 FAILED");
 
-    while (busy) #clk_tk;
-
     // cache hit
-    address = 8;
-    enable  = 1;
+    address <= 16;
+    enable  <= 1;
     #clk_tk;
-    enable = 0;
+    enable <= 0;
 
-    while (!data_ready) #clk_tk;
-
+    // check result from address 8 (one cycle delay from cache)
     if (dut.stat_cache_hits == 2) $display("test 5 passed");
     else $display("test 5 FAILED");
 
     if (instruction == 32'hAB4C3E6F) $display("test 6 passed");
     else $display("test 6 FAILED");
 
-    while (busy) #clk_tk;
-
-    // cache hit
-    address = 16;
-    enable  = 1;
+    // cache miss
+    address <= 32;
+    enable  <= 1;
     #clk_tk;
-    enable = 0;
+    enable <= 0;
 
-    while (!data_ready) #clk_tk;
-
+    // checking result from address 16 (one cycle delay from cache)
     if (dut.stat_cache_hits == 3) $display("test 7 passed");
     else $display("test 7 FAILED");
 
     if (instruction == 32'hD5B8A9C4) $display("test 8 passed");
     else $display("test 8 FAILED");
 
-    while (busy) #clk_tk;
-
-    // cache miss
-    address = 32;
-    enable  = 1;
     #clk_tk;
-    enable = 0;
 
+    // waiting for result from address 32
     while (!data_ready) #clk_tk;
 
     if (dut.stat_cache_misses == 2) $display("test 9 passed");
@@ -165,11 +161,13 @@ module TestBench;
     while (busy) #clk_tk;
 
     // cache miss (eviction)
-    address = 68;
-    enable  = 1;
+    address <= 68;
+    enable  <= 1;
     #clk_tk;
-    enable = 0;
+    enable <= 0;
 
+    #clk_tk;
+    
     while (!data_ready) #clk_tk;
 
     if (dut.stat_cache_misses == 3) $display("test 12 passed");

@@ -179,24 +179,25 @@ module CacheInstructions #(
 `ifdef DBG
             $display("address: 0x%h  line_ix: %0d  tag: %0h", address, line_ix, tag);
             if (cache_line_valid[line_ix] && cache_line_tag[line_ix] != tag) begin
-              $display("TAG MISMATCH, evict");
+              $display("tag mismatch, evict");
             end
 `endif
 
             if (cache_line_valid[line_ix] && cache_line_tag[line_ix] == tag) begin
 
 `ifdef DBG
-              $display("CACHE HIT");
+              $display("cache hit");
 `endif
 
               data <= cache_line_data[line_ix][data_ix];
               busy <= 0;
               data_ready <= 1;
               stat_cache_hits <= stat_cache_hits + 1;
-            end else begin
+
+            end else begin  // not (cache_line_valid[line_ix] && cache_line_tag[line_ix] == tag)
 
 `ifdef DBG
-              $display("CACHE MISS");
+              $display("cache miss");
 `endif
 
               stat_cache_misses <= stat_cache_misses + 1;

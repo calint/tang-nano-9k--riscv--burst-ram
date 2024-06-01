@@ -48,11 +48,11 @@ module TestBench;
     rst = 0;
 
     // read
-    cmd_en = 1;
-    cmd = 0;
-    addr = 0;
+    cmd_en <= 1;
+    cmd <= 0;
+    addr <= 0;
     #clk_tk;
-    cmd_en = 0;
+    cmd_en <= 0;
     #clk_tk;
 
     // delay before burst (DELAY_BEFORE_RD_DATA_AVAILABLE)
@@ -99,11 +99,11 @@ module TestBench;
     #clk_tk;
 
     // read
-    cmd_en = 1;
-    cmd = 0;
-    addr = 32 / 8;  // 8 bytes words
+    cmd_en <= 1;
+    cmd <= 0;
+    addr <= 32 / 8;  // 8 bytes words
     #clk_tk;
-    cmd_en = 0;
+    cmd_en <= 0;
     #clk_tk;
 
     // delay before burst (DELAY_BEFORE_RD_DATA_AVAILABLE)

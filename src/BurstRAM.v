@@ -106,7 +106,7 @@ module BurstRAM #(
         end
 
         STATE_READ_DELAY: begin
-          if (read_delay_counter == CYCLES_BEFORE_DATA_READY) begin
+          if (read_delay_counter == CYCLES_BEFORE_DATA_READY - 1) begin
             // note: not -1 because state would switch one cycle early
             rd_data_valid <= 1;
             rd_data <= data[addr_counter];
