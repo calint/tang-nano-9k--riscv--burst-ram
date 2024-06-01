@@ -37,8 +37,8 @@ module RAMIO #(
     // port B: instruction memory, byte addressed, bottom 2 bits ignored, word aligned
     input wire [ADDR_WIDTH+1:0] addrB,  // address on ram port B in bytes
     output wire [DATA_WIDTH-1:0] doutB,  // data from ram port B
-    output wire rdyB,
-    output wire bsyB,
+    output wire rdyB,  // when asserted doutB is valid
+    output wire bsyB,  // when asserted port B is busy
 
     // I/O mapping of leds
     output reg [5:0] leds,
