@@ -188,7 +188,7 @@ module TestBench;
     // write 1 byte
     address = 0;
     data_in <= 32'h12345678;
-    write_enable_bytes = 4'b0010;  // write 0x56
+    write_enable_bytes = 4'b0010;  // write 0x56 => 0xB7C6_56_80
     enable = 1;
     #clk_tk;
     enable = 0;
@@ -198,9 +198,7 @@ module TestBench;
     if (dut.stat_cache_misses == 4) $display("test 12 passed");
     else $display("test 12 FAILED");
 
-    $finish;
-
-    // read
+    // read the data with the written byte
     write_enable_bytes = 0;
     address = 0;
     enable = 1;
@@ -209,11 +207,10 @@ module TestBench;
 
     while (!data_out_ready) #clk_tk;
 
-    if (instruction == 32'h0A1B563D) $display("test 13 passed");
+    if (instruction == 32'hB7C6_56_80) $display("test 13 passed");
     else $display("test 13 FAILED");
 
     while (busy) #clk_tk;
-
 
     // some clock ticks at the end
     #clk_tk;

@@ -101,10 +101,10 @@ module CacheData #(
   localparam STATE_IDLE = 7'b0000001;
   localparam STATE_RECV_WAIT_FOR_DATA_READY = 7'b000_0010;
   localparam STATE_RECV_DATA = 7'b000_0100;
-  localparam STATE_WRITE_BACK = 7'b000_1000;
+  localparam STATE_WRITE_LINE = 7'b000_1000;
   localparam STATE_WRITE_FETCH = 7'b001_0000;
   localparam STATE_WRITE_FETCH_RECV_DATA = 7'b010_0000;
-  localparam STATE_WRITE_FETCH_WAIT_FOR_DATA_READY = 7'b100_0000;
+  localparam STATE_WRITE_FETCH_LINE = 7'b100_0000;
 
   reg [6:0] state;
 
@@ -210,11 +210,12 @@ module CacheData #(
               for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
 
 `ifdef DBG
-                $display("change %0h", cache_line_data[line_ix][data_ix]);
+                $display("change %0h, byte[%0d]=%0h", cache_line_data[line_ix][data_ix], i,
+                         data_in[(i+1)*8-1-:8]);
 `endif
 
                 if (write_enable_bytes[i]) begin
-                  cache_line_data[line_ix][data_ix][(i+1)*8-:8] <= data_in[(i+1)*8-:8];
+                  cache_line_data[line_ix][data_ix][(i+1)*8-1-:8] <= data_in[(i+1)*8-1-:8];
                 end
               end
 
@@ -236,6 +237,7 @@ module CacheData #(
               stat_cache_misses <= stat_cache_misses + 1;
 
               busy <= 1;
+              data_out_ready <= 0;
               // extract the cache line address from current address
               br_addr <= address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH];
               br_cmd_en <= 1;
@@ -245,14 +247,14 @@ module CacheData #(
                 $display("dirty");
 `endif
 
-                // first write data back then read cache line and set data
+                // write back cache line then the line and set data
                 br_cmd <= 1;  // write
                 for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
-                  br_wr_data[(i+1)*DATA_BITWIDTH-:DATA_BITWIDTH] <= cache_line_data[line_ix][i];
+                  br_wr_data[(i+1)*DATA_BITWIDTH-1-:DATA_BITWIDTH] <= cache_line_data[line_ix][i];
                 end
-                burst_counter <= 1;  // 1 because first payload sent this cycle
+                burst_counter <= 1;  // 1 because first payload is sent next cycle
                 burst_data_ix <= DATA_PER_RAM_DATA;  // skip the first payload
-                state <= STATE_WRITE_BACK;
+                state <= STATE_WRITE_LINE;
               end else begin
 
 `ifdef DBG
@@ -267,7 +269,7 @@ module CacheData #(
                 cache_line_dirty[line_ix] <= 0;
                 burst_counter <= 0;
                 burst_data_ix <= 0;
-                state <= STATE_WRITE_FETCH_WAIT_FOR_DATA_READY;
+                state <= STATE_WRITE_FETCH_LINE;
               end
             end
           end
@@ -293,16 +295,16 @@ module CacheData #(
           end
         end
 
-        STATE_WRITE_BACK: begin
+        STATE_WRITE_LINE: begin
           if (burst_counter == RAM_BURST_DATA_COUNT - 1) begin
             // -1 because of the non-blocking assignments are updated at
             // the end of the always block
             burst_counter <= 0;
             burst_data_ix <= 0;
-            // after write back is done read and set
+            // after write back is done read the line and then set the data
             br_cmd <= 0;  // read
             br_cmd_en <= 1;
-            state <= STATE_WRITE_FETCH_WAIT_FOR_DATA_READY;
+            state <= STATE_WRITE_FETCH_LINE;
           end else begin
             for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
               br_wr_data[(i+1)*DATA_BITWIDTH-1 -:DATA_BITWIDTH] 
@@ -313,8 +315,9 @@ module CacheData #(
           burst_counter <= burst_counter + 1;
         end
 
-        STATE_WRITE_FETCH_WAIT_FOR_DATA_READY: begin
+        STATE_WRITE_FETCH_LINE: begin
           br_cmd_en <= 0;  // note: can turn of 'cmd' after one cycle
+          // wait for read to be ready
           if (br_rd_data_valid) begin
             update_cache_line_data;
             state <= STATE_WRITE_FETCH_RECV_DATA;
@@ -327,13 +330,13 @@ module CacheData #(
             // -1 because of the non-blocking assignments are updated at
             // the end of the always block
 
-            // new cache line fetched
+            // new cache line has been fetched
             // write the enabled bytes into the cache line
             $display("write_enable_bytes: %0b", write_enable_bytes);
 
             for (integer i = 0; i < DATA_SIZE_BYTES; i = i + 1) begin
               if (write_enable_bytes[i]) begin
-                cache_line_data[line_ix][data_ix][(i+1)*8-1-:8] <= data_in[(i+1)*8-:8];
+                cache_line_data[line_ix][data_ix][(i+1)*8-1-:8] <= data_in[(i+1)*8-1-:8];
               end
             end
 
