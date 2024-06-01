@@ -1,4 +1,10 @@
+//
+// instruction cache connected to BurstRAM
+//
+
 `default_nettype none
+// `define DBG
+// `define INFO
 
 module Cache #(
     parameter ADDRESS_BITWIDTH = 32,
@@ -11,13 +17,13 @@ module Cache #(
 ) (
     input wire clk,
     input wire rst,
-    // port A
+    // port A: data
     input wire enA,
     input wire [DATA_BITWIDTH/8-1:0] weA,
     input wire [ADDRESS_BITWIDTH-1:0] addrA,
     input wire [DATA_BITWIDTH-1:0] dinA,
     output wire [DATA_BITWIDTH-1:0] doutA,
-    // port B
+    // port B: instructions
     input wire [ADDRESS_BITWIDTH-1:0] addrB,
     output wire [DATA_BITWIDTH-1:0] doutB,
     output wire rdyB,
@@ -89,44 +95,84 @@ module Cache #(
       .br_addr(dcache_br_addr),
       .br_rd_data(br_rd_data),
       .br_rd_data_valid(br_rd_data_valid),
-      .br_wr_data(dcache_br_wr_data),
-      .br_data_mask(dcache_br_data_mask),
+      .br_wr_data(br_wr_data),
+      .br_data_mask(br_data_mask),
       .br_busy(br_busy)
   );
 
-  // Control signals for multiplexer
+  // multiplexer signals
   reg icache_enable;
   reg dcache_enable;
 
+  // wires to CacheData
   reg dcache_command;
   wire dcache_data_out_ready;
   wire dcache_busy;
 
-  // Intermediate signals for BurstRAM
+  // BurstRAM wires
   wire icache_br_cmd;
   wire icache_br_cmd_en;
   wire [RAM_DEPTH_BITWIDTH-1:0] icache_br_addr;
   wire [RAM_BURST_DATA_BITWIDTH-1:0] icache_br_wr_data;
   wire [RAM_BURST_DATA_BITWIDTH/8-1:0] icache_br_data_mask;
 
+  // wires to CacheData
   wire dcache_br_cmd;
   wire dcache_br_cmd_en;
   wire [RAM_DEPTH_BITWIDTH-1:0] dcache_br_addr;
   wire [RAM_BURST_DATA_BITWIDTH-1:0] dcache_br_wr_data;
   wire [RAM_BURST_DATA_BITWIDTH/8-1:0] dcache_br_data_mask;
 
-  // Multiplexer logic for shared BurstRAM resource
+  // multiplexer from CacheData and CacheInstruction to BurstRAM
   assign br_cmd = icache_enable ? icache_br_cmd : dcache_br_cmd;
   assign br_cmd_en = icache_enable ? icache_br_cmd_en : dcache_br_cmd_en;
   assign br_addr = icache_enable ? icache_br_addr : dcache_br_addr;
-  assign br_wr_data = icache_enable ? icache_br_wr_data : dcache_br_wr_data;
-  assign br_data_mask = icache_enable ? icache_br_data_mask : dcache_br_data_mask;
+
+  localparam STATE_PORT_B_ACTIVE = 4'b0001;
+  localparam STATE_WAIT_FOR_PORT_B = 4'b0010;
+  localparam STATE_WAIT_FOR_PORT_A = 4'b0100;
+
+  reg [3:0] state;
 
   // Control logic to enable either icache or dcache
   always @(posedge clk or posedge rst) begin
     if (rst) begin
       icache_enable <= 1;
       dcache_enable <= 0;
+      state <= STATE_PORT_B_ACTIVE;
+    end else begin
+
+`ifdef DBG
+      $display("state: %0d  enA: ", state, enA);
+`endif
+
+      case (state)
+
+        STATE_PORT_B_ACTIVE: begin
+          icache_enable <= 1;
+          if (enA) begin
+            state <= STATE_WAIT_FOR_PORT_B;
+          end
+        end
+
+        STATE_WAIT_FOR_PORT_B: begin
+          if (!bsyB) begin
+            icache_enable <= 0;
+            dcache_enable <= 1;
+            state <= STATE_WAIT_FOR_PORT_A;
+          end
+        end
+
+        STATE_WAIT_FOR_PORT_A: begin
+          if (!enA && !dcache_busy) begin
+            icache_enable <= 1;
+            dcache_enable <= 0;
+            state <= STATE_PORT_B_ACTIVE;
+          end
+        end
+
+        default: ;
+      endcase
     end
   end
 

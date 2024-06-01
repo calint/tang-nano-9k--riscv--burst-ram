@@ -1,0 +1,78 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Sat Jun  1 23:33:14 2024
+[*]
+[dumpfile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_10/log.vcd"
+[dumpfile_mtime] "Sat Jun  1 23:30:43 2024"
+[dumpfile_size] 23269
+[savefile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_10/log.gtkw"
+[timestart] 0
+[size] 1910 1024
+[pos] -1 -1
+*-13.063684 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TestBench.
+[treeopen] TestBench.cache.
+[sst_width] 269
+[signals_width] 155
+[sst_expanded] 1
+[sst_vpaned_height] 304
+@28
+TestBench.cache.clk
+@22
+TestBench.cache.doutB[31:0]
+@28
+TestBench.cache.enA
+@22
+TestBench.cache.weA[3:0]
+TestBench.cache.dinA[31:0]
+@c00022
+TestBench.cache.doutA[31:0]
+@28
+(0)TestBench.cache.doutA[31:0]
+(1)TestBench.cache.doutA[31:0]
+(2)TestBench.cache.doutA[31:0]
+(3)TestBench.cache.doutA[31:0]
+(4)TestBench.cache.doutA[31:0]
+(5)TestBench.cache.doutA[31:0]
+(6)TestBench.cache.doutA[31:0]
+(7)TestBench.cache.doutA[31:0]
+(8)TestBench.cache.doutA[31:0]
+(9)TestBench.cache.doutA[31:0]
+(10)TestBench.cache.doutA[31:0]
+(11)TestBench.cache.doutA[31:0]
+(12)TestBench.cache.doutA[31:0]
+(13)TestBench.cache.doutA[31:0]
+(14)TestBench.cache.doutA[31:0]
+(15)TestBench.cache.doutA[31:0]
+(16)TestBench.cache.doutA[31:0]
+(17)TestBench.cache.doutA[31:0]
+(18)TestBench.cache.doutA[31:0]
+(19)TestBench.cache.doutA[31:0]
+(20)TestBench.cache.doutA[31:0]
+(21)TestBench.cache.doutA[31:0]
+(22)TestBench.cache.doutA[31:0]
+(23)TestBench.cache.doutA[31:0]
+(24)TestBench.cache.doutA[31:0]
+(25)TestBench.cache.doutA[31:0]
+(26)TestBench.cache.doutA[31:0]
+(27)TestBench.cache.doutA[31:0]
+(28)TestBench.cache.doutA[31:0]
+(29)TestBench.cache.doutA[31:0]
+(30)TestBench.cache.doutA[31:0]
+(31)TestBench.cache.doutA[31:0]
+@1401200
+-group_end
+@28
+TestBench.cache.rdyB
+@22
+TestBench.cache.state[3:0]
+TestBench.addrA[31:0]
+TestBench.addrB[31:0]
+@28
+TestBench.cache.icache.busy
+TestBench.cache.icache.data_ready
+TestBench.cache.icache_enable
+@29
+TestBench.cache.dcache_enable
+[pattern_trace] 1
+[pattern_trace] 0
