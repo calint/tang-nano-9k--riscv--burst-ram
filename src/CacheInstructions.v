@@ -90,9 +90,9 @@ module CacheInstructions #(
   // the upper bits of the address that is associated with a cache line
 
   // state machine
-  localparam STATE_IDLE = 2'b00;
-  localparam STATE_RECV_WAIT_FOR_DATA_READY = 2'b01;
-  localparam STATE_RECV_DATA = 2'b10;
+  localparam STATE_IDLE = 2'b01;
+  localparam STATE_RECV_WAIT_FOR_DATA_READY = 2'b10;
+  localparam STATE_RECV_DATA = 2'b11;
 
   reg [1:0] state;
 
@@ -170,8 +170,13 @@ module CacheInstructions #(
       burst_data_ix <= 0;
       data <= 0;
     end else begin
-      case (state)
 
+`ifdef DBG
+      $display("CacheInstructions state: %0b  enable: %0d  busy: %0d  data_ready: %0d", state,
+               enable, busy, data_ready);
+`endif
+
+      case (state)
         STATE_IDLE: begin
           // data_ready <= 0;
           if (enable) begin
@@ -237,7 +242,6 @@ module CacheInstructions #(
           end
         end
 
-        default: ;
       endcase
     end
   end

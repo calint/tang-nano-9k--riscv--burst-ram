@@ -61,7 +61,7 @@ module RAMIO #(
   // Cache #(
   //     .ADDRESS_BITWIDTH(ADDR_WIDTH + 2),
   //     // note: +2 because byte address while ADDR_WIDTH is 4 byte word address
-  //     .INSTRUCTION_BITWIDTH(32),
+  //     .DATA_BITWIDTH(32),
   //     .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
   //     .CACHE_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),
   //     .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
@@ -71,6 +71,7 @@ module RAMIO #(
   //     .clk  (clk_ram),
   //     .rst  (rst),
   //     .weA  (ram_weA),
+  //     .enA  (reA || weA),
   //     .addrA({ram_addrA, 2'b00}),
   //     .dinA (ram_dinA),
   //     .doutA(ram_doutA),
