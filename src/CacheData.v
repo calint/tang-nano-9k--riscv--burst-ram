@@ -3,8 +3,8 @@
 //
 
 `default_nettype none
-`define DBG
-`define INFO
+// `define DBG
+// `define INFO
 
 module CacheData #(
     parameter ADDRESS_BITWIDTH = 32,
@@ -156,7 +156,7 @@ module CacheData #(
 `ifdef INFO
   initial begin
     $display("----------------------------------------");
-    $display("  DCache");
+    $display("  CacheData");
     $display("----------------------------------------");
     $display("       line size: %0d B", DATA_PER_LINE * DATA_SIZE_BYTES);
     $display("           lines: %0d", LINE_COUNT);
@@ -192,7 +192,8 @@ module CacheData #(
           if (enable) begin
 
 `ifdef DBG
-            $display("address: 0x%h  line_ix: %0d  tag: %0h", address, line_ix, tag);
+            $display("address: 0x%h  line_ix: %0d  tag: %0h, write: 0b%4b", address, line_ix, tag,
+                     write_enable_bytes);
             if (cache_line_valid[line_ix] && cache_line_tag[line_ix] != tag) begin
               $display("TAG MISMATCH, evict");
             end
@@ -202,19 +203,18 @@ module CacheData #(
 
 `ifdef DBG
               $display("CACHE HIT");
+              $display("write_enable_bytes: 0b%4b", write_enable_bytes);
 `endif
 
-
-              $display("write_enable_bytes: %0b", write_enable_bytes);
               // write the data depending on which bytes are enabled
               for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
+                if (write_enable_bytes[i]) begin
 
 `ifdef DBG
-                $display("change %0h, byte[%0d]=%0h", cache_line_data[line_ix][data_ix], i,
-                         data_in[(i+1)*8-1-:8]);
+                  $display("change %0h, byte[%0d]=0x%0h", cache_line_data[line_ix][data_ix], i,
+                           data_in[(i+1)*8-1-:8]);
 `endif
 
-                if (write_enable_bytes[i]) begin
                   cache_line_data[line_ix][data_ix][(i+1)*8-1-:8] <= data_in[(i+1)*8-1-:8];
                 end
               end
@@ -223,6 +223,11 @@ module CacheData #(
                 data_out <= cache_line_data[line_ix][data_ix];
                 data_out_ready <= 1;
               end else begin
+
+`ifdef DBG
+                $display("cache line %0d dirty", line_ix);
+`endif
+
                 cache_line_dirty[line_ix] <= 1;
               end
 
@@ -247,12 +252,12 @@ module CacheData #(
                 $display("dirty");
 `endif
 
-                // write back cache line then the line and set data
+                // write back cache line then read the new line and set data
                 br_cmd <= 1;  // write
                 for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
                   br_wr_data[(i+1)*DATA_BITWIDTH-1-:DATA_BITWIDTH] <= cache_line_data[line_ix][i];
                 end
-                burst_counter <= 1;  // 1 because first payload is sent next cycle
+                burst_counter <= 0;
                 burst_data_ix <= DATA_PER_RAM_DATA;  // skip the first payload
                 state <= STATE_WRITE_LINE;
               end else begin
@@ -296,6 +301,7 @@ module CacheData #(
         end
 
         STATE_WRITE_LINE: begin
+          br_cmd_en <= 0;
           if (burst_counter == RAM_BURST_DATA_COUNT - 1) begin
             // -1 because of the non-blocking assignments are updated at
             // the end of the always block
@@ -310,9 +316,9 @@ module CacheData #(
               br_wr_data[(i+1)*DATA_BITWIDTH-1 -:DATA_BITWIDTH] 
                 <= cache_line_data[line_ix][burst_data_ix + i];
             end
+            burst_data_ix <= burst_data_ix + DATA_PER_RAM_DATA;
+            burst_counter <= burst_counter + 1;
           end
-          burst_data_ix <= burst_data_ix + DATA_PER_RAM_DATA;
-          burst_counter <= burst_counter + 1;
         end
 
         STATE_WRITE_FETCH_LINE: begin
@@ -332,7 +338,10 @@ module CacheData #(
 
             // new cache line has been fetched
             // write the enabled bytes into the cache line
-            $display("write_enable_bytes: %0b", write_enable_bytes);
+
+`ifdef DBG
+            $display("write_enable_bytes: 0b%4b", write_enable_bytes);
+`endif
 
             for (integer i = 0; i < DATA_SIZE_BYTES; i = i + 1) begin
               if (write_enable_bytes[i]) begin
@@ -343,6 +352,13 @@ module CacheData #(
             if (write_enable_bytes == 0) begin
               data_out <= cache_line_data[line_ix][data_ix];
               data_out_ready <= 1;
+            end else begin
+
+`ifdef DBG
+              $display("cache line %0d dirty", line_ix);
+`endif
+
+              cache_line_dirty[line_ix] <= 1;
             end
 
             busy <= 0;

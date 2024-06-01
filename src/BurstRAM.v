@@ -5,7 +5,7 @@
 
 `default_nettype none
 // `define DBG
-`define INFO
+// `define INFO
 
 module BurstRAM #(
     parameter DEPTH_BITWIDTH = 4,  // 2^4 * 8B entries

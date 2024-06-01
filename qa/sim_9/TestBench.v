@@ -169,7 +169,7 @@ module TestBench;
 
     while (busy) #clk_tk;
 
-    // cache miss (eviction)
+    // cache miss, evict, not dirty
     address = 68;
     enable  = 1;
     #clk_tk;
@@ -211,6 +211,19 @@ module TestBench;
     else $display("test 13 FAILED");
 
     while (busy) #clk_tk;
+
+    // write to bytes, cache miss, evict dirty
+    address = 64;
+    data_in <= 32'h12345678;
+    write_enable_bytes = 4'b0011;  // write 0x5678 to 0xD4E5F6A7B => D4E5F_5678
+    enable = 1;
+    #clk_tk;
+    enable = 0;
+
+    while (busy) #clk_tk;
+
+    if (dut.stat_cache_misses == 5) $display("test 14 passed");
+    else $display("test 14 FAILED");
 
     // some clock ticks at the end
     #clk_tk;

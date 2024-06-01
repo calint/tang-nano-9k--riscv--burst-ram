@@ -4,7 +4,7 @@
 
 `default_nettype none
 // `define DBG
-`define INFO
+// `define INFO
 
 module CacheInstructions #(
     parameter ADDRESS_BITWIDTH = 32,
@@ -141,7 +141,7 @@ module CacheInstructions #(
 `ifdef INFO
   initial begin
     $display("----------------------------------------");
-    $display("  ICache");
+    $display("  CacheInstructions");
     $display("----------------------------------------");
     $display("       line size: %0d B", DATA_PER_LINE * DATA_SIZE_BYTES);
     $display("           lines: %0d", LINE_COUNT);
