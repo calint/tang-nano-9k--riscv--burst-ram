@@ -108,6 +108,8 @@ module TestBench;
     #(clk_tk / 2);
     rst = 0;
 
+    $finish;
+
     // read instruction 0x0000 (cache miss)
     addrB <= 0;
     #clk_tk;

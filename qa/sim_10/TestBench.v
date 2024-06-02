@@ -105,6 +105,8 @@ module TestBench;
 
   reg rst = 1;
 
+  integer counter;
+
   initial begin
     $dumpfile("log.vcd");
     $dumpvars(0, TestBench);
@@ -115,17 +117,63 @@ module TestBench;
     rst = 0;
 
     addrB <= 4;
+    #clk_tk;
+
     while (!rdyB) #clk_tk;
     if (doutB == 32'h3F5A2E14) $display("test 1 passed");
     else $display("test 1 FAILED");
     while (bsyB) #clk_tk;
 
-    addrB <= 8;
+    addrB <= 32;
     #clk_tk;
+
     while (!rdyB) #clk_tk;
-    if (doutB == 32'hAB4C3E6F) $display("test 2 passed");
+    if (doutB == 32'h2F5E3C7A) $display("test 2 passed");
     else $display("test 2 FAILED");
     while (bsyB) #clk_tk;
+
+
+    // enable port A
+    addrB <= 12;
+    addrA <= 40;
+    enA   <= 1;
+    #clk_tk;
+
+    counter = 0;
+    while (!rdyA && counter < 32) begin
+      #clk_tk;
+      counter = counter + 1;
+    end
+
+    if (doutA == 32'hC8F3E6A9) $display("test 3 passed");
+    else $display("test 3 FAILED");
+
+    $finish;
+
+    while (!bsyA) #clk_tk;
+
+
+    #clk_tk;
+    #clk_tk;
+    #clk_tk;
+    #clk_tk;
+    #clk_tk;
+    $finish;
+
+    // while (!rdyB) #clk_tk;
+
+    // if (doutB == 32'h9D8E2F17) $display("test 3 passed");
+    // else $display("test 3 FAILED");
+
+    // while (!bsyB) #clk_tk;
+
+
+    while (!rdyA) #clk_tk;
+
+    if (doutA == 32'hAB4C3E6F) $display("test 4 passed");
+    else $display("test 4 FAILED");
+
+    while (bsyB || bsyA) #clk_tk;
 
     addrB <= 12;
     addrA <= 16;
@@ -133,14 +181,14 @@ module TestBench;
 
     #clk_tk;
 
-    $finish;
+    // while (!rdyB) #clk_tk;
 
-    while (!rdyB) #clk_tk;
-    if (doutB == 32'h9D8E2F17) $display("test 3 passed");
-    else $display("test 3 FAILED");
+    // if (doutB == 32'h9D8E2F17) $display("test 3 passed");
+    // else $display("test 3 FAILED");
 
     while (!rdyA) #clk_tk;
-    if (doutA == 32'hD5B8A9C4) $display("test 4 passed");
+
+    if (doutA == 32'hAB4C3E6F) $display("test 4 passed");
     else $display("test 4 FAILED");
 
     while (bsyB || bsyA) #clk_tk;

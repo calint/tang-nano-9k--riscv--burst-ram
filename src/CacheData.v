@@ -3,8 +3,8 @@
 //
 
 `default_nettype none
-// `define DBG
-// `define INFO
+`define DBG
+`define INFO
 
 module CacheData #(
     parameter ADDRESS_BITWIDTH = 32,
@@ -82,9 +82,6 @@ module CacheData #(
 
   localparam DATA_PER_LINE = 2 ** DATA_IX_IN_LINE_BITWIDTH;
   // number of data per cache line
-
-  localparam CACHE_LINE_ALIGNMENT_BITWIDTH = $clog2(DATA_PER_LINE);
-  // the lower bits of address ignored when addressing the cache line in RAM
 
   localparam DATA_PER_RAM_DATA = RAM_BURST_DATA_BITWIDTH / DATA_BITWIDTH;
   // number of data elements per RAM data retrieved, must be evenly divisible
@@ -176,7 +173,6 @@ module CacheData #(
     $display("         data ix: %0d bits", DATA_IX_IN_LINE_BITWIDTH);
     $display("  trailing zeros: %0d bits", ADDRESS_LEADING_ZEROS_BITWIDTH);
     $display(" write data mask: %0d bits", RAM_BURST_DATA_BITWIDTH / 8);
-    $display(" ram cache align: %0d bits", CACHE_LINE_ALIGNMENT_BITWIDTH);
     $display(" byte to ram shf: %0d bits", BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS);
     $display("----------------------------------------");
   end
@@ -202,8 +198,8 @@ module CacheData #(
           if (enable) begin
 
 `ifdef DBG
-            $display("address: 0x%h  line_ix: %0d  tag: %0h, write: 0b%4b", address, line_ix, tag,
-                     write_enable_bytes);
+            $display("address: 0x%h  tag: %0h  line_ix: %0d  data_ix: %0d  write: %0b", address,
+                     tag, line_ix, data_ix, write_enable_bytes);
 `endif
 
             if (cache_line_valid[line_ix] && cache_line_tag[line_ix] == tag) begin
@@ -303,11 +299,16 @@ module CacheData #(
 `endif
 
                 // extract the cache line address from current address
-                br_addr <= address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH];
+                br_addr <= {
+                  address[ADDRESS_BITWIDTH-1-:(TAG_BITWIDTH+LINE_IX_BITWIDTH)],
+                  {DATA_IX_IN_LINE_BITWIDTH{1'b0}},
+                  {ADDRESS_LEADING_ZEROS_BITWIDTH{1'b0}}
+                }>>BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS;
 
 `ifdef DBG
-                $display("read line from BurstRAM address: 0x%h",
-                         address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH]);
+                $display(
+                    "read line from BurstRAM address: 0x%h",
+                    {address[ADDRESS_BITWIDTH-1-:(TAG_BITWIDTH+LINE_IX_BITWIDTH)], {DATA_IX_IN_LINE_BITWIDTH{1'b0}}, {ADDRESS_LEADING_ZEROS_BITWIDTH{1'b0}}} >> BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS);
 `endif
 
                 // cache line not dirty; read cache line and set data
@@ -351,8 +352,14 @@ module CacheData #(
             // the end of the always block
             burst_counter <= 0;
             burst_data_ix <= 0;
+
             // after write back is done read the line and then set the data
-            br_addr <= address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH];
+            br_addr <= {
+                address[ADDRESS_BITWIDTH-1-:(TAG_BITWIDTH+LINE_IX_BITWIDTH)],
+                {DATA_IX_IN_LINE_BITWIDTH{1'b0}},
+                {ADDRESS_LEADING_ZEROS_BITWIDTH{1'b0}}
+              }>>BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS;
+
             br_cmd <= 0;  // read
             br_cmd_en <= 1;
             // set the cache line tag to the new address
@@ -361,8 +368,9 @@ module CacheData #(
             cache_line_dirty[line_ix] <= 0;
 
 `ifdef DBG
-            $display("read line from BurstRAM address: 0x%h",
-                     address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH]);
+            $display(
+                "read line from BurstRAM address: 0x%h",
+                {address[ADDRESS_BITWIDTH-1-:(TAG_BITWIDTH+LINE_IX_BITWIDTH)], {DATA_IX_IN_LINE_BITWIDTH{1'b0}}, {ADDRESS_LEADING_ZEROS_BITWIDTH{1'b0}}} >> BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS);
 `endif
 
             state <= STATE_WRITE_FETCH_LINE;

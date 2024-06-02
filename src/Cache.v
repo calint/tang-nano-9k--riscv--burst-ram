@@ -3,7 +3,7 @@
 //
 
 `default_nettype none
-// `define DBG
+`define DBG
 // `define INFO
 
 module Cache #(
@@ -130,13 +130,15 @@ module Cache #(
   wire [RAM_BURST_DATA_BITWIDTH/8-1:0] dcache_br_data_mask;
 
   localparam STATE_CACHE_INSTRUCTIONS_ACTIVE = 4'b0001;
-  localparam STATE_CACHE_DATA_ACTIVE = 4'b0010;
+  localparam STATE_CACHE_DATA_ACTIVATE = 4'b0010;
+  localparam STATE_CACHE_DATA_WAIT = 4'b0100;
 
   assign br_cmd = icache_enable ? icache_br_cmd : dcache_br_cmd;
   assign br_cmd_en = icache_enable ? icache_br_cmd_en : dcache_br_cmd_en;
   assign br_addr = icache_enable ? icache_br_addr : dcache_br_addr;
 
   reg [3:0] state;
+
   always @(posedge clk) begin
     if (rst) begin
       state <= STATE_CACHE_INSTRUCTIONS_ACTIVE;
@@ -148,7 +150,7 @@ module Cache #(
   always @(posedge clk) begin
 
 `ifdef DBG
-    $display("state: %0b  bsyA: %0d  dcache_busy: %0d", state, dcache_busy, dcache_busy);
+    $display("state: %0d  bsyA: %0d  dcache_busy: %0d", state, dcache_busy, dcache_busy);
 `endif
 
     case (state)
@@ -157,11 +159,16 @@ module Cache #(
         if (!bsyB && enA) begin
           icache_enable <= 0;
           dcache_enable <= 1;
-          state = STATE_CACHE_DATA_ACTIVE;
+          state = STATE_CACHE_DATA_ACTIVATE;
         end
       end
 
-      STATE_CACHE_DATA_ACTIVE: begin
+      STATE_CACHE_DATA_ACTIVATE: begin
+        // note: skip one cycle for 'dcache_busy' to go high
+        state <= STATE_CACHE_DATA_WAIT;
+      end
+
+      STATE_CACHE_DATA_WAIT: begin
         if (!dcache_busy) begin
           icache_enable <= 1;
           dcache_enable <= 0;

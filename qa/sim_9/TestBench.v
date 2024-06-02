@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 //
+// CacheData
+//
 `default_nettype none
 
 module TestBench;
@@ -235,6 +237,20 @@ module TestBench;
     while (!data_out_ready) #clk_tk;
 
     if (data == 32'hB7C6_56_80) $display("test 15 passed");
+    else $display("test 15 FAILED");
+
+    while (busy) #clk_tk;
+
+    //
+    write_enable_bytes = 0;
+    address = 8;
+    enable = 1;
+    #clk_tk;
+    enable = 0;
+
+    while (!data_out_ready) #clk_tk;
+
+    if (data == 32'hAB4C3E6F) $display("test 15 passed");
     else $display("test 15 FAILED");
 
     while (busy) #clk_tk;
