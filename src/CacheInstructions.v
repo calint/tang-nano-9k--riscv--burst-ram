@@ -102,10 +102,10 @@ module CacheInstructions #(
   //
   // cache data storage
   //
-  reg cache_line_valid[LINE_IX_BITWIDTH-1:0];
+  reg cache_line_valid[LINE_COUNT-1:0];
   // array of bits asserting if a cache line is loaded
 
-  reg [TAG_BITWIDTH-1:0] cache_line_tag[LINE_IX_BITWIDTH-1:0];
+  reg [TAG_BITWIDTH-1:0] cache_line_tag[LINE_COUNT-1:0];
   // the upper bits of the address compared with the request to evict and load a new cache line
 
   reg [DATA_BITWIDTH-1:0] cache_line_data[LINE_COUNT-1:0][DATA_PER_LINE-1:0];
@@ -174,18 +174,14 @@ module CacheInstructions #(
       data <= 0;
     end else begin
 
-`ifdef DBG
-      $display("CacheInstructions state: %0b  enable: %0d  busy: %0d  data_ready: %0d", state,
-               enable, busy, data_ready);
-`endif
-
       case (state)
         STATE_IDLE: begin
           // data_ready <= 0;
           if (enable) begin
 
 `ifdef DBG
-            $display("address: 0x%h  line_ix: %0d  tag: %0h", address, line_ix, tag);
+            $display("address: 0x%h  tag: %0d  line_ix: %0d  data_ix: %0d", address, tag, line_ix,
+                     data_ix);
             if (cache_line_valid[line_ix] && cache_line_tag[line_ix] != tag) begin
               $display("tag mismatch, evict");
             end
@@ -218,6 +214,13 @@ module CacheInstructions #(
                   {DATA_IX_IN_LINE_BITWIDTH{1'b0}},
                   {ADDRESS_LEADING_ZEROS_BITWIDTH{1'b0}}
                 }>>BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS;
+
+`ifdef DBG
+              $display(
+                  "load cache line from BurstRAM address: %h",
+                  {address[ADDRESS_BITWIDTH-1-:(TAG_BITWIDTH+LINE_IX_BITWIDTH)], {DATA_IX_IN_LINE_BITWIDTH{1'b0}}, {ADDRESS_LEADING_ZEROS_BITWIDTH{1'b0}}} >> BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS);
+`endif
+
               br_cmd_en <= 1;
               cache_line_valid[line_ix] <= 1;
               // note: ok to flag cache line as valid here

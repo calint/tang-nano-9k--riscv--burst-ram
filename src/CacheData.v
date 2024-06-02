@@ -114,13 +114,13 @@ module CacheData #(
   //
   // cache data storage
   //
-  reg cache_line_valid[LINE_IX_BITWIDTH-1:0];
+  reg cache_line_valid[LINE_COUNT-1:0];
   // array of bits asserting if a cache line is loaded
 
-  reg cache_line_dirty[LINE_IX_BITWIDTH-1:0];
+  reg cache_line_dirty[LINE_COUNT-1:0];
   // array of bits asserting if a cache line needs to be written when evicted
 
-  reg [TAG_BITWIDTH-1:0] cache_line_tag[LINE_IX_BITWIDTH-1:0];
+  reg [TAG_BITWIDTH-1:0] cache_line_tag[LINE_COUNT-1:0];
   // the upper bits of the address compared with the request to evict and load a new cache line
 
   reg [DATA_BITWIDTH-1:0] cache_line_data[LINE_COUNT-1:0][DATA_PER_LINE-1:0];

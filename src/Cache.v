@@ -150,10 +150,10 @@ module Cache #(
 
   always @(posedge clk) begin
 
-`ifdef DBG
-    $display("state: %0d  rdyA: %0d  bsyA: %0d  dcache_busy: %0d", state, rdyA, dcache_busy,
-             dcache_busy);
-`endif
+// `ifdef DBG
+//     $display("state: %0d  rdyA: %0d  bsyA: %0d  dcache_busy: %0d", state, rdyA, dcache_busy,
+//              dcache_busy);
+// `endif
 
     case (state)
 

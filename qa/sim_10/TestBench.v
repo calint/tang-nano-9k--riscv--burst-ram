@@ -132,11 +132,10 @@ module TestBench;
     else $display("test 2 FAILED");
     while (bsyB) #clk_tk;
 
-
     // enable port A
     addrB <= 12;
-    addrA <= 40;
-    enA   <= 1;
+    // addrA <= 40;
+    // enA   <= 1;
     #clk_tk;
 
     counter = 0;
@@ -145,16 +144,15 @@ module TestBench;
       counter = counter + 1;
     end
 
-    $finish;
-    while (!rdyA) #clk_tk;
+    // while (!rdyA) #clk_tk;
     if (doutA == 32'hC8F3E6A9) $display("test 3 passed");
     else $display("test 3 FAILED");
-    while (!bsyA) #clk_tk;
+    // while (!bsyA) #clk_tk;
 
-    while (!rdyB) #clk_tk;
+    // while (!rdyB) #clk_tk;
     if (doutB == 32'h9D8E2F17) $display("test 4 passed");
     else $display("test 4 FAILED");
-    while (!bsyB) #clk_tk;
+    // while (!bsyB) #clk_tk;
 
     $finish;
 
