@@ -71,9 +71,6 @@ module CacheInstructions #(
   localparam DATA_PER_LINE = 2 ** DATA_IX_IN_LINE_BITWIDTH;
   // number of data per cache line
 
-  localparam CACHE_LINE_ALIGNMENT_BITWIDTH = $clog2(DATA_PER_LINE);
-  // the lower bits of address ignored when addressing the cache line in RAM
-
   localparam DATA_PER_RAM_DATA = RAM_BURST_DATA_BITWIDTH / DATA_BITWIDTH;
   // number of data elements per RAM data retrieved, must be evenly divisible
   // note: RAM may have bigger data such as 64 bit when data is 32 bit
@@ -88,6 +85,12 @@ module CacheInstructions #(
     ADDRESS_BITWIDTH - LINE_IX_BITWIDTH - 
     DATA_IX_IN_LINE_BITWIDTH - ADDRESS_LEADING_ZEROS_BITWIDTH;
   // the upper bits of the address that is associated with a cache line
+
+  localparam BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS = ADDRESS_LEADING_ZEROS_BITWIDTH + $clog2(
+      RAM_BURST_DATA_BITWIDTH / DATA_BITWIDTH
+  );
+  // shift right amount to convert byte address to RAM address
+
 
   // state machine
   localparam STATE_IDLE = 2'b01;
@@ -210,7 +213,11 @@ module CacheInstructions #(
               data_ready <= 0;
               br_cmd <= 0;  // read
               // extract the cache line address from current address
-              br_addr <= address[ADDRESS_BITWIDTH-1:CACHE_LINE_ALIGNMENT_BITWIDTH];
+              br_addr <= {
+                  address[ADDRESS_BITWIDTH-1-:(TAG_BITWIDTH+LINE_IX_BITWIDTH)],
+                  {DATA_IX_IN_LINE_BITWIDTH{1'b0}},
+                  {ADDRESS_LEADING_ZEROS_BITWIDTH{1'b0}}
+                }>>BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS;
               br_cmd_en <= 1;
               cache_line_valid[line_ix] <= 1;
               // note: ok to flag cache line as valid here
