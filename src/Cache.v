@@ -44,7 +44,7 @@ module Cache #(
     input wire br_busy
 );
 
-  // port A
+  // port B
   CacheInstructions #(
       .ADDRESS_BITWIDTH(ADDRESS_BITWIDTH),
       .DATA_BITWIDTH(32),
@@ -71,7 +71,7 @@ module Cache #(
       .br_busy(br_busy)
   );
 
-  // port B
+  // port A
   CacheData #(
       .ADDRESS_BITWIDTH(ADDRESS_BITWIDTH),
       .DATA_BITWIDTH(32),
