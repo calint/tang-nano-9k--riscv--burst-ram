@@ -192,6 +192,8 @@ module CacheData #(
       burst_counter <= 0;
       burst_data_ix <= 0;
       data_out <= 0;
+      br_cmd_en <= 0;
+      br_cmd <= 0;
     end else begin
       case (state)
 

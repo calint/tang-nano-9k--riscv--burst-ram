@@ -48,6 +48,8 @@ module TestBench;
       .addrA(addrA),
       .dinA (dinA),
       .doutA(doutA),
+      .rdyA (rdyA),
+      .bsyA (bsyA),
 
       .addrB(addrB),
       .doutB(doutB),
@@ -77,11 +79,14 @@ module TestBench;
   // --
 
   // Cache interface
+  reg enA = 0;
+  reg [3:0] weA = 0;
   reg [31:0] addrA = 0;
   reg [31:0] dinA = 0;
-  reg [3:0] weA = 0;
-  reg enA = 0;
   wire [31:0] doutA;
+  wire rdyA;
+  wire bsyA;
+
   reg [31:0] addrB = 0;
   wire [31:0] doutB;
   wire rdyB;
@@ -109,76 +114,38 @@ module TestBench;
     #(clk_tk / 2);
     rst = 0;
 
-    // read instruction 0x0000 (cache miss) and request write
     addrB <= 4;
-    enA   <= 1;
-    weA   <= 4'b1111;
-    addrA <= 32;
-    dinA  <= 32'h2367_abcd;
-
-    #clk_tk;
+    while (!rdyB) #clk_tk;
+    if (doutB == 32'h3F5A2E14) $display("test 1 passed");
+    else $display("test 1 FAILED");
+    while (bsyB) #clk_tk;
 
     addrB <= 8;
+    #clk_tk;
+    while (!rdyB) #clk_tk;
+    if (doutB == 32'hAB4C3E6F) $display("test 2 passed");
+    else $display("test 2 FAILED");
+    while (bsyB) #clk_tk;
+
+    addrB <= 12;
+    addrA <= 16;
     enA   <= 1;
-    weA   <= 4'b1111;
-    addrA <= 36;
-    dinA  <= 32'hfedc_ba98;
 
     #clk_tk;
 
-    addrB <= 8;
-    enA   <= 0;
+    $finish;
 
-    #clk_tk;
+    while (!rdyB) #clk_tk;
+    if (doutB == 32'h9D8E2F17) $display("test 3 passed");
+    else $display("test 3 FAILED");
 
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
+    while (!rdyA) #clk_tk;
+    if (doutA == 32'hD5B8A9C4) $display("test 4 passed");
+    else $display("test 4 FAILED");
+
+    while (bsyB || bsyA) #clk_tk;
+
+    rst <= 1;
     #clk_tk;
     #clk_tk;
     #clk_tk;
