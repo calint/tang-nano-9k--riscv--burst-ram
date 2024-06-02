@@ -140,17 +140,24 @@ module TestBench;
     #clk_tk;
 
     counter = 0;
-    while (!rdyA && counter < 32) begin
+    while (!rdyA && counter < 16) begin
       #clk_tk;
       counter = counter + 1;
     end
 
+    $finish;
+    while (!rdyA) #clk_tk;
     if (doutA == 32'hC8F3E6A9) $display("test 3 passed");
     else $display("test 3 FAILED");
+    while (!bsyA) #clk_tk;
+
+    while (!rdyB) #clk_tk;
+    if (doutB == 32'h9D8E2F17) $display("test 4 passed");
+    else $display("test 4 FAILED");
+    while (!bsyB) #clk_tk;
 
     $finish;
 
-    while (!bsyA) #clk_tk;
 
 
     #clk_tk;
