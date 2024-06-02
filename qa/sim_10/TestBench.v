@@ -141,52 +141,27 @@ module TestBench;
     while (!rdyA) #clk_tk;
     if (doutA == 32'hC8F3E6A9) $display("test 3 passed");
     else $display("test 3 FAILED");
-    while (!bsyA) #clk_tk;
+    while (bsyA) #clk_tk;
 
-    // while (!rdyB) #clk_tk;
+    while (!rdyB) #clk_tk;
     if (doutB == 32'h9D8E2F17) $display("test 4 passed");
     else $display("test 4 FAILED");
-    // while (!bsyB) #clk_tk;
+    while (bsyB) #clk_tk;
 
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    #clk_tk;
-    $finish;
-
-    // while (!rdyB) #clk_tk;
-
-    // if (doutB == 32'h9D8E2F17) $display("test 3 passed");
-    // else $display("test 3 FAILED");
-
-    // while (!bsyB) #clk_tk;
-
-
-    while (!rdyA) #clk_tk;
-
-    if (doutA == 32'hAB4C3E6F) $display("test 4 passed");
-    else $display("test 4 FAILED");
-
-    while (bsyB || bsyA) #clk_tk;
-
-    addrB <= 12;
-    addrA <= 16;
+    addrB <= 36;
+    addrA <= 36;
     enA   <= 1;
-
     #clk_tk;
 
-    // while (!rdyB) #clk_tk;
-
-    // if (doutB == 32'h9D8E2F17) $display("test 3 passed");
-    // else $display("test 3 FAILED");
-
     while (!rdyA) #clk_tk;
+    if (doutA == 32'h6C4B9A8D) $display("test 5 passed");
+    else $display("test 3 FAILED");
+    while (bsyA) #clk_tk;
 
-    if (doutA == 32'hAB4C3E6F) $display("test 4 passed");
+    while (!rdyB) #clk_tk;
+    if (doutB == 32'h6C4B9A8D) $display("test 6 passed");
     else $display("test 4 FAILED");
-
-    while (bsyB || bsyA) #clk_tk;
+    while (bsyB) #clk_tk;
 
     rst <= 1;
     #clk_tk;
