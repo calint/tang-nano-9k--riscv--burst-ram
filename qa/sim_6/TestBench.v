@@ -10,7 +10,7 @@ module TestBench;
       .DATA_FILE("RAM.mem"),
       .DATA_BITWIDTH(64),
       .DEPTH_BITWIDTH(4),
-      .CYCLES_BEFORE_DATA_READY(3),
+      .CYCLES_BEFORE_DATA_VALID(3),
       .BURST_COUNT(4)
   ) burst_ram (
       .clk(clk),
@@ -41,7 +41,7 @@ module TestBench;
       .enable(enable),
       .address(address),
       .data(instruction),
-      .data_ready(data_ready),
+      .data_valid(data_valid),
       .busy(busy),
 
       // wiring to BurstRAM (prefix br_)
@@ -73,7 +73,7 @@ module TestBench;
   reg enable = 0;
   reg [31:0] address = 0;
   wire [31:0] instruction;
-  wire data_ready;
+  wire data_valid;
   wire busy;
 
   initial begin
@@ -91,7 +91,7 @@ module TestBench;
     #clk_tk;
     enable <= 0;
 
-    while (!data_ready) #clk_tk;
+    while (!data_valid) #clk_tk;
 
     if (dut.stat_cache_misses == 1) $display("test 1 passed");
     else $display("test 1 FAILED");
@@ -150,7 +150,7 @@ module TestBench;
     #clk_tk;
 
     // waiting for result from address 32
-    while (!data_ready) #clk_tk;
+    while (!data_valid) #clk_tk;
 
     if (dut.stat_cache_misses == 2) $display("test 9 passed");
     else $display("test 9 FAILED");
@@ -168,7 +168,7 @@ module TestBench;
 
     #clk_tk;
     
-    while (!data_ready) #clk_tk;
+    while (!data_valid) #clk_tk;
 
     if (dut.stat_cache_misses == 3) $display("test 12 passed");
     else $display("test 12 FAILED");

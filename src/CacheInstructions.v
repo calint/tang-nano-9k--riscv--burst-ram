@@ -50,12 +50,12 @@ module CacheInstructions #(
     output reg [DATA_BITWIDTH-1:0] data,
     // the cached data of the address
 
-    output reg data_ready,
+    output reg data_valid,
     // data retrieved and valid
 
     output reg busy,
     // asserted while busy
-    // note: data_ready may be asserted while busy is asserted
+    // note: data_valid may be asserted while busy is asserted
 
     // -- wiring to BurstRAM (prefix br_) -- -- -- -- -- --
     output reg br_cmd,
@@ -94,7 +94,7 @@ module CacheInstructions #(
 
   // state machine
   localparam STATE_IDLE = 2'b01;
-  localparam STATE_RECV_WAIT_FOR_DATA_READY = 2'b10;
+  localparam STATE_RECV_WAIT_FOR_DATA_VALID = 2'b10;
   localparam STATE_RECV_DATA = 2'b11;
 
   reg [1:0] state;
@@ -166,7 +166,7 @@ module CacheInstructions #(
     if (rst) begin
       state <= STATE_IDLE;
       busy <= 0;
-      data_ready <= 0;
+      data_valid <= 0;
       stat_cache_hits <= 0;
       stat_cache_misses <= 0;
       burst_counter <= 0;
@@ -179,7 +179,7 @@ module CacheInstructions #(
 
       case (state)
         STATE_IDLE: begin
-          // data_ready <= 0;
+          // data_valid <= 0;
           if (enable) begin
 
 `ifdef DBG
@@ -198,7 +198,7 @@ module CacheInstructions #(
 
               data <= cache_line_data[line_ix][data_ix];
               busy <= 0;
-              data_ready <= 1;
+              data_valid <= 1;
               stat_cache_hits <= stat_cache_hits + 1;
 
             end else begin  // not (cache_line_valid[line_ix] && cache_line_tag[line_ix] == tag)
@@ -209,7 +209,7 @@ module CacheInstructions #(
 
               stat_cache_misses <= stat_cache_misses + 1;
               busy <= 1;
-              data_ready <= 0;
+              data_valid <= 0;
               br_cmd <= 0;  // read
               // extract the cache line address from current address
               br_addr <= {
@@ -230,12 +230,12 @@ module CacheInstructions #(
               cache_line_tag[line_ix] <= tag;
               burst_counter <= 0;
               burst_data_ix <= 0;
-              state <= STATE_RECV_WAIT_FOR_DATA_READY;
+              state <= STATE_RECV_WAIT_FOR_DATA_VALID;
             end
           end
         end
 
-        STATE_RECV_WAIT_FOR_DATA_READY: begin
+        STATE_RECV_WAIT_FOR_DATA_VALID: begin
           br_cmd_en <= 0;  // note: can turn of 'cmd' after one cycle
           if (br_rd_data_valid) begin
             update_cache_line_data;
@@ -278,7 +278,7 @@ module CacheInstructions #(
         // check if this was the requested data
         if (data_ix == burst_data_ix + i) begin
           data <= br_rd_data[(i+1)*DATA_BITWIDTH-1-:DATA_BITWIDTH];
-          data_ready <= 1;
+          data_valid <= 1;
         end
       end
 

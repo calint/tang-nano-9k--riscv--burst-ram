@@ -15,7 +15,7 @@ module TestBench;
       .DATA_FILE("RAM.mem"),
       .DATA_BITWIDTH(RAM_DATA_BITWIDTH),
       .DEPTH_BITWIDTH(RAM_ADDRESS_BITWIDTH),
-      .CYCLES_BEFORE_DATA_READY(3),
+      .CYCLES_BEFORE_DATA_VALID(3),
       .BURST_COUNT(RAM_BURST_COUNT)
   ) burst_ram (
       .clk(clk_ram),
@@ -49,12 +49,12 @@ module TestBench;
       .addrA(addrA),
       .dinA (dinA),
       .doutA(doutA),
-      .rdyA (rdyA),
+      .validA (validA),
       .bsyA (bsyA),
 
       .addrB(addrB),
       .doutB(doutB),
-      .rdyB (rdyB),
+      .validB (validB),
       .bsyB (bsyB),
 
       // wiring to BurstRAM (prefix br_)
@@ -85,12 +85,12 @@ module TestBench;
   reg [31:0] addrA = 0;
   reg [31:0] dinA = 0;
   wire [31:0] doutA;
-  wire rdyA;
+  wire validA;
   wire bsyA;
 
   reg [31:0] addrB = 0;
   wire [31:0] doutB;
-  wire rdyB;
+  wire validB;
   wire bsyB;
   // --
 
@@ -120,7 +120,7 @@ module TestBench;
     addrB <= 4;
     #clk_tk;
 
-    while (!rdyB) #clk_tk;
+    while (!validB) #clk_tk;
     if (doutB == 32'h3F5A2E14) $display("test 1 passed");
     else $display("test 1 FAILED");
     while (bsyB) #clk_tk;
@@ -128,7 +128,7 @@ module TestBench;
     addrB <= 32;
     #clk_tk;
 
-    while (!rdyB) #clk_tk;
+    while (!validB) #clk_tk;
     if (doutB == 32'h2F5E3C7A) $display("test 2 passed");
     else $display("test 2 FAILED");
     while (bsyB) #clk_tk;
@@ -139,12 +139,12 @@ module TestBench;
     enA   <= 1;
     #clk_tk;
 
-    while (!rdyA) #clk_tk;
+    while (!validA) #clk_tk;
     if (doutA == 32'hC8F3E6A9) $display("test 3 passed");
     else $display("test 3 FAILED");
     while (bsyA) #clk_tk;
 
-    while (!rdyB) #clk_tk;
+    while (!validB) #clk_tk;
     if (doutB == 32'h9D8E2F17) $display("test 4 passed");
     else $display("test 4 FAILED");
     while (bsyB) #clk_tk;
@@ -154,12 +154,12 @@ module TestBench;
     enA   <= 1;
     #clk_tk;
 
-    while (!rdyA) #clk_tk;
+    while (!validA) #clk_tk;
     if (doutA == 32'h6C4B9A8D) $display("test 5 passed");
     else $display("test 3 FAILED");
     while (bsyA) #clk_tk;
 
-    while (!rdyB) #clk_tk;
+    while (!validB) #clk_tk;
     if (doutB == 32'h6C4B9A8D) $display("test 6 passed");
     else $display("test 4 FAILED");
     while (bsyB) #clk_tk;
@@ -169,7 +169,7 @@ module TestBench;
     enA   <= 1;
     #clk_tk;
 
-    while (!(rdyA && rdyB)) #clk_tk;
+    while (!(validA && validB)) #clk_tk;
 
     if (doutA == 32'hF2A3B4C5) $display("test 7 passed");
     else $display("test 7 FAILED");
@@ -184,7 +184,7 @@ module TestBench;
     enA   <= 1;
     #clk_tk;
 
-    while (!(rdyA && rdyB)) #clk_tk;
+    while (!(validA && validB)) #clk_tk;
 
     if (doutA == 32'hB0C1D2E3) $display("test 9 passed");
     else $display("test 9 FAILED");

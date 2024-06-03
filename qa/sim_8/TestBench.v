@@ -14,7 +14,7 @@ module TestBench;
       .DATA_FILE("RAM.mem"),
       .DATA_BITWIDTH(RAM_DATA_BITWIDTH),
       .DEPTH_BITWIDTH(RAM_ADDRESS_BITWIDTH),
-      .CYCLES_BEFORE_DATA_READY(3),
+      .CYCLES_BEFORE_DATA_VALID(3),
       .BURST_COUNT(RAM_BURST_COUNT)
   ) burst_ram (
       .clk(clk_ram),
@@ -47,11 +47,13 @@ module TestBench;
       .addrA(addrA),
       .dinA (dinA),
       .doutA(doutA),
+      .validA(validA),
+      .bsyA(bsyA),
 
-      .addrB(addrB),
-      .doutB(doutB),
-      .rdyB (rdyB),
-      .bsyB (bsyB),
+      .addrB (addrB),
+      .doutB (doutB),
+      .validB(validB),
+      .bsyB  (bsyB),
 
       // wiring to BurstRAM (prefix br_)
       .br_cmd(br_cmd),
@@ -78,12 +80,15 @@ module TestBench;
   // Cache interface
   reg [31:0] addrA = 0;
   reg [31:0] dinA = 0;
-  reg [3:0] weA = 0;
   reg enA = 0;
+  reg [3:0] weA = 0;
   wire [31:0] doutA;
+  wire validA;
+  wire bsyA;
+
   reg [31:0] addrB = 0;
   wire [31:0] doutB;
-  wire rdyB;
+  wire validB;
   wire bsyB;
   // --
 
@@ -115,7 +120,7 @@ module TestBench;
     #clk_tk;
     #clk_tk;
 
-    while (!rdyB) #clk_tk;
+    while (!validB) #clk_tk;
 
     if (doutB == 32'hB7C6A980) $display("test 1 passed");
     else $display("test 1 FAILED");
@@ -131,7 +136,7 @@ module TestBench;
     #clk_tk;
 
     // check result from address 4 (one cycle delay)
-    if (rdyB) $display("test 2 passed");
+    if (validB) $display("test 2 passed");
     else $display("test 2 FAILED");
 
     if (!bsyB) $display("test 3 passed");
@@ -146,7 +151,7 @@ module TestBench;
     else $display("test 4 FAILED");
 
     // the cache miss from address 64
-    while (!rdyB) #clk_tk;
+    while (!validB) #clk_tk;
 
     if (doutB == 32'h4E5F6A7B) $display("test 5 passed");
     else $display("test 5 FAILED");
@@ -157,7 +162,7 @@ module TestBench;
     addrB <= 32;
     #clk_tk;
 
-    while (!rdyB) #clk_tk;
+    while (!validB) #clk_tk;
 
     if (doutB == 32'h2F5E3C7A) $display("test 7 passed");
     else $display("test 7 FAILED");

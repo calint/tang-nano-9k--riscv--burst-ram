@@ -53,12 +53,12 @@ module CacheData #(
     output reg [DATA_BITWIDTH-1:0] data_out,
     // the cached data of the address
 
-    output reg data_out_ready,
+    output reg data_out_valid,
     // data retrieved and valid
 
     output reg busy,
     // asserted while busy
-    // note: data_out_ready may be asserted while busy is asserted
+    // note: data_out_valid may be asserted while busy is asserted
     //       if burst ram transaction not complete
 
     input wire [DATA_BITWIDTH/8-1:0] write_enable_bytes,
@@ -102,7 +102,7 @@ module CacheData #(
 
   // state machine
   localparam STATE_IDLE = 7'b0000001;
-  localparam STATE_RECV_WAIT_FOR_DATA_READY = 7'b000_0010;
+  localparam STATE_RECV_WAIT_FOR_DATA_VALID = 7'b000_0010;
   localparam STATE_RECV_DATA = 7'b000_0100;
   localparam STATE_WRITE_LINE = 7'b000_1000;
   localparam STATE_WRITE_FETCH = 7'b001_0000;
@@ -182,7 +182,7 @@ module CacheData #(
     if (rst) begin
       state <= STATE_IDLE;
       busy <= 0;
-      data_out_ready <= 0;
+      data_out_valid <= 0;
       stat_cache_hits <= 0;
       stat_cache_misses <= 0;
       burst_counter <= 0;
@@ -196,7 +196,7 @@ module CacheData #(
       case (state)
 
         STATE_IDLE: begin
-          // data_out_ready <= 0;
+          // data_out_valid <= 0;
           if (enable) begin
 
 `ifdef DBG
@@ -225,7 +225,7 @@ module CacheData #(
 
               if (write_enable_bytes == 0) begin
                 data_out <= cache_line_data[line_ix][data_ix];
-                data_out_ready <= 1;
+                data_out_valid <= 1;
               end else begin
 
 `ifdef DBG
@@ -255,7 +255,7 @@ module CacheData #(
               stat_cache_misses <= stat_cache_misses + 1;
 
               busy <= 1;
-              data_out_ready <= 0;
+              data_out_valid <= 0;
               br_cmd_en <= 1;
               if (cache_line_dirty[line_ix]) begin
 
@@ -327,7 +327,7 @@ module CacheData #(
           end
         end
 
-        STATE_RECV_WAIT_FOR_DATA_READY: begin
+        STATE_RECV_WAIT_FOR_DATA_VALID: begin
           br_cmd_en <= 0;  // note: can turn of 'cmd' after one cycle
           if (br_rd_data_valid) begin
             update_cache_line_data;
@@ -417,7 +417,7 @@ module CacheData #(
 
             if (write_enable_bytes == 0) begin
               data_out <= cache_line_data[line_ix][data_ix];
-              data_out_ready <= 1;
+              data_out_valid <= 1;
             end else begin
 
 `ifdef DBG
@@ -457,7 +457,7 @@ module CacheData #(
         // check if this was the requested data
         if (data_ix == burst_data_ix + i) begin
           data_out <= br_rd_data[(i+1)*DATA_BITWIDTH-1-:DATA_BITWIDTH];
-          data_out_ready <= 1;
+          data_out_valid <= 1;
         end
       end
 

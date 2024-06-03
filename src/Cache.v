@@ -25,13 +25,13 @@ module Cache #(
     input wire [ADDRESS_BITWIDTH-1:0] addrA,
     input wire [DATA_BITWIDTH-1:0] dinA,
     output wire [DATA_BITWIDTH-1:0] doutA,
-    output wire rdyA,
+    output wire validA,
     output wire bsyA,
 
     // port B: instructions
     input wire [ADDRESS_BITWIDTH-1:0] addrB,
     output wire [DATA_BITWIDTH-1:0] doutB,
-    output wire rdyB,
+    output wire validB,
     output wire bsyB,
 
     // wiring to BurstRAM (prefix br_)
@@ -61,7 +61,7 @@ module Cache #(
       .enable(icache_enable),
       .address(addrB),
       .data(doutB),
-      .data_ready(rdyB),
+      .data_valid(validB),
       .busy(bsyB),
 
       // -- wiring to BurstRAM (prefix br_) -- -- -- -- -- --
@@ -92,7 +92,7 @@ module Cache #(
       .address(addrA),
       .data_in(dinA),
       .data_out(doutA),
-      .data_out_ready(dcache_data_out_ready),
+      .data_out_valid(dcache_data_out_valid),
       .busy(dcache_busy),
 
       // -- wiring to BurstRAM (prefix br_) -- -- -- -- -- --
@@ -116,13 +116,13 @@ module Cache #(
   // port A to CacheData
   wire dcache_command;
   wire dcache_busy;
-  wire dcache_data_out_ready;
+  wire dcache_data_out_valid;
 
   reg icache_enable;
   reg dcache_enable;
 
-  assign bsyA = dcache_busy;
-  assign rdyA = dcache_data_out_ready;
+  assign bsyA   = dcache_busy;
+  assign validA = dcache_data_out_valid;
 
   // 
   wire dcache_br_cmd;
@@ -149,7 +149,7 @@ module Cache #(
       dcache_enable <= 0;
     end else begin
       // `ifdef DBG
-      //     $display("state: %0d  rdyA: %0d  bsyA: %0d  dcache_busy: %0d", state, rdyA, dcache_busy,
+      //     $display("state: %0d  validA: %0d  bsyA: %0d  dcache_busy: %0d", state, validA, dcache_busy,
       //              dcache_busy);
       // `endif
 

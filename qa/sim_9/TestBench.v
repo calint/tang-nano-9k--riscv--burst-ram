@@ -10,7 +10,7 @@ module TestBench;
       .DATA_FILE("RAM.mem"),
       .DATA_BITWIDTH(64),
       .DEPTH_BITWIDTH(4),
-      .CYCLES_BEFORE_DATA_READY(3),
+      .CYCLES_BEFORE_DATA_VALID(3),
       .BURST_COUNT(4)
   ) burst_ram (
       .clk(clk),
@@ -41,7 +41,7 @@ module TestBench;
       .enable(enable),
       .address(address),
       .data_out(data),
-      .data_out_ready(data_out_ready),
+      .data_out_valid(data_out_valid),
       .data_in(data_in),
       .write_enable_bytes(write_enable_bytes),
       .busy(busy),
@@ -76,7 +76,7 @@ module TestBench;
   reg enable = 0;
   reg [31:0] address = 0;
   wire [31:0] data;
-  wire data_out_ready;
+  wire data_out_valid;
   reg [31:0] data_in = 0;
   reg [3:0] write_enable_bytes = 0;
   wire busy;
@@ -96,7 +96,7 @@ module TestBench;
     #clk_tk;
     enable = 0;
 
-    while (!data_out_ready) #clk_tk;
+    while (!data_out_valid) #clk_tk;
 
     if (dut.stat_cache_misses == 1) $display("test 1 passed");
     else $display("test 1 FAILED");
@@ -113,7 +113,7 @@ module TestBench;
     #clk_tk;
     enable = 0;
 
-    while (!data_out_ready) #clk_tk;
+    while (!data_out_valid) #clk_tk;
 
     if (dut.stat_cache_hits == 1) $display("test 3 passed");
     else $display("test 3 FAILED");
@@ -129,7 +129,7 @@ module TestBench;
     #clk_tk;
     enable = 0;
 
-    while (!data_out_ready) #clk_tk;
+    while (!data_out_valid) #clk_tk;
 
     if (dut.stat_cache_hits == 2) $display("test 5 passed");
     else $display("test 5 FAILED");
@@ -145,7 +145,7 @@ module TestBench;
     #clk_tk;
     enable = 0;
 
-    while (!data_out_ready) #clk_tk;
+    while (!data_out_valid) #clk_tk;
 
     if (dut.stat_cache_hits == 3) $display("test 7 passed");
     else $display("test 7 FAILED");
@@ -161,7 +161,7 @@ module TestBench;
     #clk_tk;
     enable = 0;
 
-    while (!data_out_ready) #clk_tk;
+    while (!data_out_valid) #clk_tk;
 
     if (dut.stat_cache_misses == 2) $display("test 9 passed");
     else $display("test 9 FAILED");
@@ -177,7 +177,7 @@ module TestBench;
     #clk_tk;
     enable = 0;
 
-    while (!data_out_ready) #clk_tk;
+    while (!data_out_valid) #clk_tk;
 
     if (dut.stat_cache_misses == 3) $display("test 12 passed");
     else $display("test 12 FAILED");
@@ -207,7 +207,7 @@ module TestBench;
     #clk_tk;
     enable = 0;
 
-    while (!data_out_ready) #clk_tk;
+    while (!data_out_valid) #clk_tk;
 
     if (data == 32'hB7C6_56_80) $display("test 13 passed");
     else $display("test 13 FAILED");
@@ -234,7 +234,7 @@ module TestBench;
     #clk_tk;
     enable = 0;
 
-    while (!data_out_ready) #clk_tk;
+    while (!data_out_valid) #clk_tk;
 
     if (data == 32'hB7C6_56_80) $display("test 15 passed");
     else $display("test 15 FAILED");
@@ -248,7 +248,7 @@ module TestBench;
     #clk_tk;
     enable = 0;
 
-    while (!data_out_ready) #clk_tk;
+    while (!data_out_valid) #clk_tk;
 
     if (data == 32'hAB4C3E6F) $display("test 15 passed");
     else $display("test 15 FAILED");

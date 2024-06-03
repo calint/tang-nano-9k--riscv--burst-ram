@@ -10,7 +10,7 @@
 module BurstRAM #(
     parameter DEPTH_BITWIDTH = 4,  // 2^4 * 8B entries
     parameter DATA_FILE = "",
-    parameter CYCLES_BEFORE_DATA_READY = 8,
+    parameter CYCLES_BEFORE_DATA_VALID = 8,
     parameter BURST_COUNT = 4,
     parameter DATA_BITWIDTH = 64  // must be divisible by 8
 ) (
@@ -32,7 +32,7 @@ module BurstRAM #(
 
   reg [DATA_BITWIDTH-1:0] data[DEPTH-1:0];
   reg [$clog2(BURST_COUNT)-1:0] burst_counter;
-  reg [$clog2(CYCLES_BEFORE_DATA_READY):0] read_delay_counter;
+  reg [$clog2(CYCLES_BEFORE_DATA_VALID):0] read_delay_counter;
   // note: not -1 because it should delay the number of cycles
   reg [DEPTH-1:0] addr_counter;
 
@@ -52,7 +52,7 @@ module BurstRAM #(
     $display("         size: %0d B", DEPTH * DATA_BITWIDTH / 8);
     $display("        depth: %0d", DEPTH);
     $display("    data size: %0d bits", DATA_BITWIDTH);
-    $display(" read latency: %0d cycles", CYCLES_BEFORE_DATA_READY);
+    $display(" read latency: %0d cycles", CYCLES_BEFORE_DATA_VALID);
     $display("----------------------------------------");
 `endif
 
@@ -106,7 +106,7 @@ module BurstRAM #(
         end
 
         STATE_READ_DELAY: begin
-          if (read_delay_counter == CYCLES_BEFORE_DATA_READY - 1) begin
+          if (read_delay_counter == CYCLES_BEFORE_DATA_VALID - 1) begin
             // note: not -1 because state would switch one cycle early
             rd_data_valid <= 1;
             rd_data <= data[addr_counter];

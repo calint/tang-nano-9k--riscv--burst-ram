@@ -7,7 +7,7 @@
 module TestBench;
   BurstRAM #(
       .DATA_FILE(""),
-      .CYCLES_BEFORE_DATA_READY(4),
+      .CYCLES_BEFORE_DATA_VALID(4),
       .BURST_COUNT(4),
       .DEPTH_BITWIDTH(4)
   ) dut (
