@@ -101,7 +101,7 @@ module TestBench;
   // port B
   reg enB;
   reg [31:0] addrB = 0;
-  wire [31:0] doutB = 0;
+  wire [31:0] doutB;
   wire validB;
   wire bsyB;
   // --
@@ -116,9 +116,11 @@ module TestBench;
     rst <= 0;
     #clk_tk;
 
+    while (bsyA || bsyB) #clk_tk;
+
     // write 4 consecutive bytes then read a word
     enA   <= 1;
-    weA   <= 1;
+    weA   <= 4'b0001;
 
     dinA  <= 8'h12;
     addrA <= 0;

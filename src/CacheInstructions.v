@@ -93,11 +93,11 @@ module CacheInstructions #(
 
 
   // state machine
-  localparam STATE_IDLE = 2'b01;
-  localparam STATE_RECV_WAIT_FOR_DATA_VALID = 2'b10;
-  localparam STATE_RECV_DATA = 2'b11;
+  localparam STATE_IDLE = 3'b001;
+  localparam STATE_RECV_WAIT_FOR_DATA_VALID = 3'b010;
+  localparam STATE_RECV_DATA = 3'b100;
 
-  reg [1:0] state;
+  reg [2:0] state;
 
   //
   // cache data storage

@@ -1,17 +1,18 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Mon Jun  3 17:40:05 2024
+[*] Mon Jun  3 19:26:23 2024
 [*]
 [dumpfile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_2/log.vcd"
-[dumpfile_mtime] "Mon Jun  3 17:36:26 2024"
-[dumpfile_size] 19452
+[dumpfile_mtime] "Mon Jun  3 19:24:14 2024"
+[dumpfile_size] 19659
 [savefile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_2/log.gtkw"
 [timestart] 0
 [size] 1910 1024
 [pos] -1 -1
-*-12.730799 44210 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-13.963103 83000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TestBench.
 [treeopen] TestBench.dut.
+[treeopen] TestBench.dut.cache.
 [sst_width] 269
 [signals_width] 275
 [sst_expanded] 1
@@ -48,25 +49,79 @@ TestBench.dut.bsyA
 @200
 -ramio/cache
 @28
-TestBench.dut.cache.dcache_enable
-TestBench.dut.cache.enA
-@22
-TestBench.dut.cache.addrA[31:0]
-@29
-TestBench.dut.cache.weA[3:0]
-@22
-TestBench.dut.cache.dinA[31:0]
-TestBench.dut.cache.state[3:0]
-@28
-TestBench.dut.cache.validA
-TestBench.dut.cache.bsyA
 TestBench.dut.cache.icache_enable
 TestBench.dut.cache.dcache_enable
 @22
+TestBench.dut.cache.state[3:0]
+@28
+TestBench.dut.cache.enA
+@22
+TestBench.dut.cache.addrA[31:0]
+@28
+TestBench.dut.cache.weA[3:0]
+@22
+TestBench.dut.cache.dinA[31:0]
+@23
+TestBench.dut.cache.doutA[31:0]
+@28
+TestBench.dut.cache.validA
+TestBench.dut.cache.bsyA
+@22
 TestBench.dut.cache.addrB[31:0]
+@c00022
+TestBench.dut.cache.doutB[31:0]
+@28
+(0)TestBench.dut.cache.doutB[31:0]
+(1)TestBench.dut.cache.doutB[31:0]
+(2)TestBench.dut.cache.doutB[31:0]
+(3)TestBench.dut.cache.doutB[31:0]
+(4)TestBench.dut.cache.doutB[31:0]
+(5)TestBench.dut.cache.doutB[31:0]
+(6)TestBench.dut.cache.doutB[31:0]
+(7)TestBench.dut.cache.doutB[31:0]
+(8)TestBench.dut.cache.doutB[31:0]
+(9)TestBench.dut.cache.doutB[31:0]
+(10)TestBench.dut.cache.doutB[31:0]
+(11)TestBench.dut.cache.doutB[31:0]
+(12)TestBench.dut.cache.doutB[31:0]
+(13)TestBench.dut.cache.doutB[31:0]
+(14)TestBench.dut.cache.doutB[31:0]
+(15)TestBench.dut.cache.doutB[31:0]
+(16)TestBench.dut.cache.doutB[31:0]
+(17)TestBench.dut.cache.doutB[31:0]
+(18)TestBench.dut.cache.doutB[31:0]
+(19)TestBench.dut.cache.doutB[31:0]
+(20)TestBench.dut.cache.doutB[31:0]
+(21)TestBench.dut.cache.doutB[31:0]
+(22)TestBench.dut.cache.doutB[31:0]
+(23)TestBench.dut.cache.doutB[31:0]
+(24)TestBench.dut.cache.doutB[31:0]
+(25)TestBench.dut.cache.doutB[31:0]
+(26)TestBench.dut.cache.doutB[31:0]
+(27)TestBench.dut.cache.doutB[31:0]
+(28)TestBench.dut.cache.doutB[31:0]
+(29)TestBench.dut.cache.doutB[31:0]
+(30)TestBench.dut.cache.doutB[31:0]
+(31)TestBench.dut.cache.doutB[31:0]
+@1401200
+-group_end
 @28
 TestBench.dut.cache.validB
 TestBench.dut.cache.bsyB
+@200
+-ramio/cache/i
+@22
+TestBench.dut.cache.icache.address[31:0]
+@28
+TestBench.dut.cache.icache.enable
+TestBench.dut.cache.icache.busy
+@22
+TestBench.dut.cache.icache.data[31:0]
+@28
+TestBench.dut.cache.icache.data_valid
+TestBench.dut.cache.icache.busy
+TestBench.dut.cache.icache.data_ix[2:0]
+TestBench.dut.cache.icache.line_ix
 @200
 -burst_ram
 @28
