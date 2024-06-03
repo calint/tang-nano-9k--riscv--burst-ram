@@ -165,7 +165,7 @@ module Cache #(
         end
 
         STATE_DCACHE_ACTIVATE: begin
-          // note: skip one cycle for 'dcache_busy' to go high
+          // note: skip one cycle for 'bsyA' to go high
           state <= STATE_DCACHE_WAIT;
         end
 
