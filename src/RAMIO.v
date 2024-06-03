@@ -82,7 +82,7 @@ module RAMIO #(
       .bsyA(bsyA),
 
       // port B: instructions
-      .addrB ({addrA[31:2], 2'b00}),
+      .addrB ({addrB[31:2], 2'b00}),
       .doutB (doutB),
       .validB(validB),
       .bsyB  (bsyB),
