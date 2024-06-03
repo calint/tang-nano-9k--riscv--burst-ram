@@ -169,6 +169,7 @@ module TestBench;
     #clk_tk;
 
     while (!(rdyA && rdyB)) #clk_tk;
+
     if (doutA == 32'hF2A3B4C5) $display("test 7 passed");
     else $display("test 7 FAILED");
 
