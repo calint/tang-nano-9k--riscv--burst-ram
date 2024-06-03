@@ -178,6 +178,21 @@ module TestBench;
 
     while (bsyA || bsyB) #clk_tk;
 
+    addrB <= 72;
+    addrA <= 80;
+    enA   <= 1;
+    #clk_tk;
+
+    while (!(rdyA && rdyB)) #clk_tk;
+
+    if (doutA == 32'hB0C1D2E3) $display("test 9 passed");
+    else $display("test 9 FAILED");
+
+    if (doutB == 32'hF2A3B4C5) $display("test 10 passed");
+    else $display("test 10 FAILED");
+
+    while (bsyA || bsyB) #clk_tk;
+
     rst <= 1;
     #clk_tk;
     #clk_tk;

@@ -1,6 +1,7 @@
 [x] Cache: if port A gets enabled pause port B
-[ ] CacheData, CacheInstruction, Cache: study the possibility of 'always @(*)'
-    to optimize one cycle delay (etc/archived-files/always_star)
+[ ] Cache: study the possibility of 'always @(*)' of CacheData and CacheInstruction
+    to optimize one cycle delay when switching between caches to BurstRAM
+    'etc/archived-files/always_star'
 [ ] ICache: busy->idle state switch skipped if new command?
     if busy 0 can be predicted then a cycle can be saved by sending new command
     before entering 'idle' state
