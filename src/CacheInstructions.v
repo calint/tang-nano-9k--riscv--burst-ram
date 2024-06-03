@@ -19,6 +19,9 @@ module CacheInstructions #(
     parameter LINE_IX_BITWIDTH = 1,
     // 2 ^ 1 = 2 cache lines
 
+    parameter ADDRESS_LEADING_ZEROS_BITWIDTH = 2,
+    // number of leading zeros in the address; assumes 32 bit word aligned access
+
     parameter RAM_BURST_DATA_COUNT = 4,
     // consecutive data elements retrieved in a burst
 
@@ -74,9 +77,6 @@ module CacheInstructions #(
   localparam DATA_PER_RAM_DATA = RAM_BURST_DATA_BITWIDTH / DATA_BITWIDTH;
   // number of data elements per RAM data retrieved, must be evenly divisible
   // note: RAM may have bigger data such as 64 bit when data is 32 bit
-
-  localparam ADDRESS_LEADING_ZEROS_BITWIDTH = 2;
-  // number of leading zeros in the address; assumes 32 bit word aligned access
 
   localparam LINE_COUNT = 2 ** LINE_IX_BITWIDTH;
   // number of cache lines

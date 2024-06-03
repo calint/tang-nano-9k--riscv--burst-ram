@@ -19,6 +19,9 @@ module CacheData #(
     parameter LINE_IX_BITWIDTH = 1,
     // 2 ^ 1 = 2 cache lines
 
+    parameter ADDRESS_LEADING_ZEROS_BITWIDTH = 2,
+    // data accessed have leading 2 zeros; 4 bytes aligned, e.g. 0xabcdef00
+
     parameter RAM_BURST_DATA_COUNT = 4,
     // consecutive data elements retrieved in a burst
 
@@ -31,11 +34,8 @@ module CacheData #(
     //       32 B
     // RAM reads 4 * 8 = 32 B per burst
 
-    parameter RAM_DEPTH_BITWIDTH = 8,
+    parameter RAM_DEPTH_BITWIDTH = 8
     // size of RAM: 2 ^ RAM_DEPTH_BITWIDTH * RAM_BURST_DATA_BITWIDTH / 8 = 2 KB
-
-    parameter ADDRESS_LEADING_ZEROS_BITWIDTH = 2
-    // addresses accessed have leading 2 zeros; e.g. 0xabcdef00
 ) (
     input wire clk,  // RAM clock
 
