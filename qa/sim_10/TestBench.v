@@ -8,13 +8,13 @@
 module TestBench;
 
   localparam RAM_DATA_BITWIDTH = 64;
-  localparam RAM_ADDRESS_BITWIDTH = 8;  // 2 ^ 8 * 8 bytes RAM
+  localparam RAM_DEPTH_BITWIDTH = 8;  // 2 ^ 8 * 8 bytes RAM
   localparam RAM_BURST_COUNT = 4;
 
   BurstRAM #(
       .DATA_FILE("RAM.mem"),
       .DATA_BITWIDTH(RAM_DATA_BITWIDTH),
-      .DEPTH_BITWIDTH(RAM_ADDRESS_BITWIDTH),
+      .DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
       .CYCLES_BEFORE_DATA_VALID(3),
       .BURST_COUNT(RAM_BURST_COUNT)
   ) burst_ram (
@@ -37,7 +37,7 @@ module TestBench;
       .CACHE_LINE_IX_BITWIDTH(1),
       .CACHE_IX_IN_LINE_BITWIDTH(3),
       .CACHE_ADDRESS_LEADING_ZEROS_BITWIDTH(2),
-      .RAM_DEPTH_BITWIDTH(RAM_ADDRESS_BITWIDTH),
+      .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
       .RAM_BURST_DATA_COUNT(RAM_BURST_COUNT),
       .RAM_BURST_DATA_BITWIDTH(RAM_DATA_BITWIDTH)
   ) cache (
@@ -71,7 +71,7 @@ module TestBench;
   // wiring between BurstRAM and Cache
   wire br_cmd;
   wire br_cmd_en;
-  wire [RAM_ADDRESS_BITWIDTH-1:0] br_addr;
+  wire [RAM_DEPTH_BITWIDTH-1:0] br_addr;
   wire [63:0] br_wr_data;
   wire [7:0] br_data_mask;
   wire [63:0] br_rd_data;

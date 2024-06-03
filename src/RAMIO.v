@@ -21,16 +21,16 @@ module RAMIO #(
     parameter RAM_BURST_DATA_BITWIDTH = 64
 ) (
     input wire rst,
-
-    // port A: data memory, read / write byte addressable ram
     input wire clk,
     input wire clk_ram,
+
+    // port A: data memory, read / write byte addressable ram
     input wire enA,  // enables port A
-    input wire [1:0] weA,  // write enable port A (b01 - byte, b10 - half word, b11 - word)
     input wire [2:0] reA, // read enable port A (reA[2] sign extended, b01: byte, b10: half word, b11: word)
+    input wire [1:0] weA,  // write enable port A (b01 - byte, b10 - half word, b11 - word)
     input wire [31:0] addrA,  // address on port A in bytes
-    input wire [31:0] dinA,  // data to ram port A, sign extended byte, half word, word
     output reg [31:0] doutA,  // data from ram port A at 'addrA' according to 'reA'
+    input wire [31:0] dinA,  // data to ram port A, sign extended byte, half word, word
     output wire validA,  // when asserted doutA is valid
     output wire bsyA,  // when asserted port A is busy
 

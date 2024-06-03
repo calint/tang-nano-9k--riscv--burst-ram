@@ -12,8 +12,9 @@ module SoC #(
     parameter RAM_BURST_DATA_COUNT = 4,
     parameter RAM_BURST_DATA_BITWIDTH = 64
 ) (
-    input wire clk,
     input wire rst,
+    input wire clk,
+    input wire clk_ram,
     output wire [5:0] led,
     input wire uart_rx,
     output wire uart_tx,
@@ -51,11 +52,21 @@ module SoC #(
   reg regs_rd_we;
   wire signed [31:0] regs_rd1;  // register value of 'rs1'
   wire signed [31:0] regs_rd2;  // register value of 'rs2'
-  reg [1:0] ram_weA;  // ram port A write enable
+
+  // RAM port A
+  reg ram_enA;
   reg [2:0] ram_reA;  // ram port A read enable
+  reg [1:0] ram_weA;  // ram port A write enable
   reg [31:0] ram_addrA;  // ram port A address
   reg [31:0] ram_dinA;  // data to ram port A
   wire [31:0] ram_doutA;  // data from ram port A
+  wire ram_validA;
+  wire ram_bsyA;
+
+  // RAM port B
+  reg ram_enB;
+  wire ram_validB;
+  wire ram_bsyB;
 
   reg is_ld;  // current instruction is 'load'
   reg [4:0] ld_rd;  // previous instruction 'rd'
@@ -292,21 +303,39 @@ module SoC #(
       .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH)
   ) ram (
       .rst(rst),
+      .clk(clk_ram),
+
       // port A: data memory, read / write byte addressable ram
-      .clk(clk),
-      .weA(ram_weA),  // write: b01 - byte, b10 - half word, b11 - word
+      .enA(ram_enA),  // enables port A
       .reA(ram_reA),  // read: reA[2] sign extended, b01 - byte, b10 - half word, b11 - word
+      .weA(ram_weA),  // write: b01 - byte, b10 - half word, b11 - word
       .addrA(ram_addrA),  // +1 because byte addressable
-      .dinA(ram_dinA),  // data to write to 'ram_addrA' depending on 'ram_weA'
       .doutA(ram_doutA),  // data out from 'ram_addrA' depending on 'ram_reA' one cycle later
+      .dinA(ram_dinA),  // data to write to 'ram_addrA' depending on 'ram_weA'
+      .validA(ram_validA),  // when asserted doutA is valid
+      .bsyA(ram_bsyA),  // when asserted port A is busy
 
       // port B: instruction memory, byte addressed, bottom 2 bits ignored, word aligned
+      .enB(ram_enB),  // enables port B
       .addrB(pc),  // program counter
       .doutB(ir),  // instruction register
+      .validB(ram_validB),  // when asserted doutB is valid
+      .bsyB(ram_bsyB),  // when asserted port B is busy
 
+      // I/O
       .leds(led),
       .uart_tx(uart_tx),
-      .uart_rx(uart_rx)
+      .uart_rx(uart_rx),
+
+      // wiring to BurstRAM (prefix br_)
+      .br_cmd(br_cmd),
+      .br_cmd_en(br_cmd_en),
+      .br_addr(br_addr),
+      .br_wr_data(br_wr_data),
+      .br_data_mask(br_data_mask),
+      .br_rd_data(br_rd_data),
+      .br_rd_data_valid(br_rd_data_valid),
+      .br_busy(br_busy)
   );
 
 endmodule
