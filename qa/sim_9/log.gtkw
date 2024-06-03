@@ -1,16 +1,17 @@
 [*]
 [*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
-[*] Sat Jun  1 17:36:56 2024
+[*] Mon Jun  3 09:00:02 2024
 [*]
 [dumpfile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_9/log.vcd"
-[dumpfile_mtime] "Sat Jun  1 17:34:12 2024"
-[dumpfile_size] 16090
+[dumpfile_mtime] "Mon Jun  3 08:58:40 2024"
+[dumpfile_size] 18001063
 [savefile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_9/log.gtkw"
 [timestart] 0
 [size] 1910 1024
 [pos] -1 -1
-*-14.497989 65000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+*-14.497989 85000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [treeopen] TestBench.
+[treeopen] TestBench.burst_ram.
 [sst_width] 269
 [signals_width] 300
 [sst_expanded] 1
@@ -19,18 +20,81 @@
 TestBench.rst
 TestBench.enable
 TestBench.clk
+@200
+-TestBench
+@28
+TestBench.busy
+@22
+TestBench.address[31:0]
+@28
+TestBench.data_out_ready
+@200
+-CacheData
+@c00029
+TestBench.dut.state[6:0]
+@29
+(0)TestBench.dut.state[6:0]
+(1)TestBench.dut.state[6:0]
+(2)TestBench.dut.state[6:0]
+(3)TestBench.dut.state[6:0]
+(4)TestBench.dut.state[6:0]
+(5)TestBench.dut.state[6:0]
+(6)TestBench.dut.state[6:0]
+@1401201
+-group_end
+@24
+TestBench.dut.burst_counter[1:0]
+@28
 TestBench.write_enable_bytes[3:0]
 @22
-TestBench.data_in[31:0]
 [color] 5
 TestBench.address[31:0]
+TestBench.data_in[31:0]
+@c00022
 TestBench.data[31:0]
+@28
+(0)TestBench.data[31:0]
+(1)TestBench.data[31:0]
+(2)TestBench.data[31:0]
+(3)TestBench.data[31:0]
+(4)TestBench.data[31:0]
+(5)TestBench.data[31:0]
+(6)TestBench.data[31:0]
+(7)TestBench.data[31:0]
+(8)TestBench.data[31:0]
+(9)TestBench.data[31:0]
+(10)TestBench.data[31:0]
+(11)TestBench.data[31:0]
+(12)TestBench.data[31:0]
+(13)TestBench.data[31:0]
+(14)TestBench.data[31:0]
+(15)TestBench.data[31:0]
+(16)TestBench.data[31:0]
+(17)TestBench.data[31:0]
+(18)TestBench.data[31:0]
+(19)TestBench.data[31:0]
+(20)TestBench.data[31:0]
+(21)TestBench.data[31:0]
+(22)TestBench.data[31:0]
+(23)TestBench.data[31:0]
+(24)TestBench.data[31:0]
+(25)TestBench.data[31:0]
+(26)TestBench.data[31:0]
+(27)TestBench.data[31:0]
+(28)TestBench.data[31:0]
+(29)TestBench.data[31:0]
+(30)TestBench.data[31:0]
+(31)TestBench.data[31:0]
+@1401200
+-group_end
 @28
 [color] 3
 TestBench.data_out_ready
-TestBench.dut.state[6:0]
 [color] 2
 TestBench.busy
+@200
+-BurstRAM
+@28
 [color] 4
 TestBench.br_rd_data_valid
 @24
@@ -49,7 +113,6 @@ TestBench.dut.br_wr_data[63:0]
 @24
 TestBench.burst_ram.state[2:0]
 TestBench.burst_ram.burst_counter[1:0]
-@25
 TestBench.burst_ram.read_delay_counter[2:0]
 [pattern_trace] 1
 [pattern_trace] 0
