@@ -75,14 +75,14 @@ module RAMIO #(
       // port A: data
       .enA(ram_enA),
       .weA(ram_weA),
-      .addrA(addrA),
+      .addrA({addrA[31:2], 2'b00}),
       .dinA(ram_dinA),
       .doutA(ram_doutA),
       .validA(validA),
       .bsyA(bsyA),
 
       // port B: instructions
-      .addrB (addrB),
+      .addrB ({addrA[31:2], 2'b00}),
       .doutB (doutB),
       .validB(validB),
       .bsyB  (bsyB),
