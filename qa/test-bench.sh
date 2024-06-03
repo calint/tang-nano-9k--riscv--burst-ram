@@ -5,7 +5,7 @@
 set -e
 cd $(dirname "$0")
 
-SIMPTH=$1
+SIMPTH="$1"
 TB=TestBench.v
 SRCPTH=../../src
 
