@@ -92,8 +92,8 @@ module Cache #(
       .address(addrA),
       .data_in(dinA),
       .data_out(doutA),
-      .data_out_valid(dcache_data_out_valid),
-      .busy(dcache_busy),
+      .data_out_valid(validA),
+      .busy(bsyA),
 
       // -- wiring to BurstRAM (prefix br_) -- -- -- -- -- --
       .br_cmd(dcache_br_cmd),
@@ -115,14 +115,9 @@ module Cache #(
 
   // port A to CacheData
   wire dcache_command;
-  wire dcache_busy;
-  wire dcache_data_out_valid;
 
   reg icache_enable;
   reg dcache_enable;
-
-  assign bsyA   = dcache_busy;
-  assign validA = dcache_data_out_valid;
 
   // 
   wire dcache_br_cmd;
@@ -148,6 +143,7 @@ module Cache #(
       icache_enable <= 1;
       dcache_enable <= 0;
     end else begin
+
       // `ifdef DBG
       //     $display("state: %0d  validA: %0d  bsyA: %0d  dcache_busy: %0d", state, validA, dcache_busy,
       //              dcache_busy);
@@ -174,7 +170,7 @@ module Cache #(
         end
 
         STATE_DCACHE_WAIT: begin
-          if (!dcache_busy) begin
+          if (!bsyA) begin
             icache_enable <= 1;
             dcache_enable <= 0;
             state = STATE_ICACHE_ACTIVATE;

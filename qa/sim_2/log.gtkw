@@ -1,0 +1,84 @@
+[*]
+[*] GTKWave Analyzer v3.3.116 (w)1999-2023 BSI
+[*] Mon Jun  3 17:30:20 2024
+[*]
+[dumpfile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_2/log.vcd"
+[dumpfile_mtime] "Mon Jun  3 17:29:16 2024"
+[dumpfile_size] 19499
+[savefile] "/home/c/w/tang-nano-9k--riscv--burst-ram/qa/sim_2/log.gtkw"
+[timestart] 0
+[size] 1910 1024
+[pos] -1 -1
+*-13.730799 53000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TestBench.
+[treeopen] TestBench.dut.
+[sst_width] 269
+[signals_width] 275
+[sst_expanded] 1
+[sst_vpaned_height] 304
+@28
+TestBench.rst
+TestBench.clk
+TestBench.clk_ram
+TestBench.enA
+TestBench.reA[2:0]
+TestBench.weA[1:0]
+@22
+TestBench.addrA[31:0]
+TestBench.dinA[31:0]
+TestBench.doutA[31:0]
+@28
+TestBench.validA
+TestBench.bsyA
+@22
+TestBench.addrB[31:0]
+TestBench.doutB[31:0]
+@28
+TestBench.validB
+TestBench.bsyB
+@200
+-ramio
+@28
+TestBench.dut.enA
+@22
+TestBench.dut.addrA[31:0]
+@28
+TestBench.dut.validA
+TestBench.dut.bsyA
+@200
+-ramio/cache
+@28
+TestBench.dut.cache.dcache_enable
+TestBench.dut.cache.enA
+@22
+TestBench.dut.cache.addrA[31:0]
+TestBench.dut.cache.dinA[31:0]
+TestBench.dut.cache.state[3:0]
+@28
+TestBench.dut.cache.validA
+TestBench.dut.cache.bsyA
+TestBench.dut.cache.icache_enable
+@29
+TestBench.dut.cache.dcache_enable
+@22
+TestBench.dut.cache.addrB[31:0]
+@28
+TestBench.dut.cache.validB
+TestBench.dut.cache.bsyB
+@200
+-burst_ram
+@28
+TestBench.burst_ram.cmd
+TestBench.burst_ram.cmd_en
+@22
+TestBench.burst_ram.addr[7:0]
+TestBench.burst_ram.rd_data[63:0]
+TestBench.burst_ram.wr_data[63:0]
+@28
+TestBench.burst_ram.rd_data_valid
+@22
+TestBench.burst_ram.wr_data[63:0]
+@28
+TestBench.burst_ram.busy
+[pattern_trace] 1
+[pattern_trace] 0

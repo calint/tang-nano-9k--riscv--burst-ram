@@ -2,17 +2,32 @@
 //`define DBG
 
 module SoC #(
-    parameter RAM_FILE = "",
-    parameter CLK_FREQ = 50_000_000,
+    parameter CLK_FREQ  = 50_000_000,
     parameter BAUD_RATE = 9600,
-    parameter RAM_ADDR_WIDTH = 13  // RAM depth: 2^13 in 4 bytes words 
+
+    // RAM and cache
+    parameter CACHE_LINE_IX_BITWIDTH = 1,
+    parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
+    parameter RAM_DEPTH_BITWIDTH = 8,
+    parameter RAM_BURST_DATA_COUNT = 4,
+    parameter RAM_BURST_DATA_BITWIDTH = 64
 ) (
     input wire clk,
     input wire rst,
     output wire [5:0] led,
     input wire uart_rx,
     output wire uart_tx,
-    input wire btn
+    input wire btn,
+
+    // wiring to BurstRAM (prefix br_)
+    output wire br_cmd,
+    output wire br_cmd_en,
+    output wire [RAM_DEPTH_BITWIDTH-1:0] br_addr,
+    output wire [RAM_BURST_DATA_BITWIDTH-1:0] br_wr_data,
+    output wire [RAM_BURST_DATA_BITWIDTH/8-1:0] br_data_mask,
+    input wire [RAM_BURST_DATA_BITWIDTH-1:0] br_rd_data,
+    input wire br_rd_data_valid,
+    input wire br_busy
 );
 
   reg [31:0] pc;  // program counter, byte addressed, next instruction to fetch
@@ -266,22 +281,27 @@ module SoC #(
   );
 
   RAMIO #(
-      .ADDR_WIDTH(RAM_ADDR_WIDTH),  // RAM depth: 2^x in 4 bytes words 
-      .DATA_FILE(RAM_FILE),  // initial memory content
-      .CLK_FREQ(CLK_FREQ),
-      .BAUD_RATE(BAUD_RATE)
+      .CLK_FREQ (CLK_FREQ),
+      .BAUD_RATE(BAUD_RATE),
+
+      // RAM and cache
+      .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
+      .CACHE_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),
+      .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
+      .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT),
+      .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH)
   ) ram (
       .rst(rst),
       // port A: data memory, read / write byte addressable ram
       .clk(clk),
       .weA(ram_weA),  // write: b01 - byte, b10 - half word, b11 - word
       .reA(ram_reA),  // read: reA[2] sign extended, b01 - byte, b10 - half word, b11 - word
-      .addrA(ram_addrA[RAM_ADDR_WIDTH+1:0]),  // +1 because byte addressable
+      .addrA(ram_addrA),  // +1 because byte addressable
       .dinA(ram_dinA),  // data to write to 'ram_addrA' depending on 'ram_weA'
       .doutA(ram_doutA),  // data out from 'ram_addrA' depending on 'ram_reA' one cycle later
 
       // port B: instruction memory, byte addressed, bottom 2 bits ignored, word aligned
-      .addrB(pc[RAM_ADDR_WIDTH+1:0]),  // program counter (+1 because byte addressable)
+      .addrB(pc),  // program counter
       .doutB(ir),  // instruction register
 
       .leds(led),

@@ -3,15 +3,12 @@
 //
 
 `default_nettype none
-//`define DBG
+`define DBG
 
 module RAMIO #(
-    parameter ADDR_WIDTH = 16,  // 2**16 = RAM depth in 4 byte words
-    parameter DATA_WIDTH = 32,
-    parameter DATA_FILE = "",
     parameter CLK_FREQ = 50_000_000,
     parameter BAUD_RATE = 9600,
-    parameter TOP_ADDR = {(ADDR_WIDTH + 2) {1'b1}},
+    parameter TOP_ADDR = {32{1'b1}},
     parameter ADDR_LEDS = TOP_ADDR,  // address of leds, 7 bits, rgb 4:6 enabled is off
     parameter ADDR_UART_OUT = TOP_ADDR - 1,  // send byte address
     parameter ADDR_UART_IN = TOP_ADDR - 2,  // received byte address, must be read with 'lbu'
@@ -28,16 +25,20 @@ module RAMIO #(
     // port A: data memory, read / write byte addressable ram
     input wire clk,
     input wire clk_ram,
+    input wire enA,  // enables port A
     input wire [1:0] weA,  // write enable port A (b01 - byte, b10 - half word, b11 - word)
     input wire [2:0] reA, // read enable port A (reA[2] sign extended, b01: byte, b10: half word, b11: word)
-    input wire [ADDR_WIDTH+1:0] addrA,  // address on port A in bytes
-    input wire [DATA_WIDTH-1:0] dinA,  // data to ram port A, sign extended byte, half word, word
-    output reg [DATA_WIDTH-1:0] doutA,  // data from ram port A at 'addrA' according to 'reA'
+    input wire [31:0] addrA,  // address on port A in bytes
+    input wire [31:0] dinA,  // data to ram port A, sign extended byte, half word, word
+    output reg [31:0] doutA,  // data from ram port A at 'addrA' according to 'reA'
+    output wire validA,  // when asserted doutA is valid
+    output wire bsyA,  // when asserted port A is busy
 
     // port B: instruction memory, byte addressed, bottom 2 bits ignored, word aligned
-    input wire [ADDR_WIDTH+1:0] addrB,  // address on ram port B in bytes
-    output wire [DATA_WIDTH-1:0] doutB,  // data from ram port B
-    output wire rdyB,  // when asserted doutB is valid
+    input wire enB,  // enables port B
+    input wire [31:0] addrB,  // address on ram port B in bytes
+    output wire [31:0] doutB,  // data from ram port B
+    output wire validB,  // when asserted doutB is valid
     output wire bsyB,  // when asserted port B is busy
 
     // I/O mapping of leds
@@ -58,50 +59,43 @@ module RAMIO #(
     input wire br_busy
 );
 
-  // Cache #(
-  //     .ADDRESS_BITWIDTH(ADDR_WIDTH + 2),
-  //     // note: +2 because byte address while ADDR_WIDTH is 4 byte word address
-  //     .DATA_BITWIDTH(32),
-  //     .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
-  //     .CACHE_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),
-  //     .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
-  //     .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT),
-  //     .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH)
-  // ) cache (
-  //     .clk  (clk_ram),
-  //     .rst  (rst),
-  //     .weA  (ram_weA),
-  //     .enA  (reA || weA),
-  //     .addrA({ram_addrA, 2'b00}),
-  //     .dinA (ram_dinA),
-  //     .doutA(ram_doutA),
-  //     .addrB(addrB),
-  //     .doutB(doutB),
-  //     .validB (validB),
-  //     .bsyB (bsyB),
+  Cache #(
+      .ADDRESS_BITWIDTH(32),
+      .DATA_BITWIDTH(32),
+      .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
+      .CACHE_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),
+      .CACHE_ADDRESS_LEADING_ZEROS_BITWIDTH(2),
+      .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
+      .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT),
+      .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH)
+  ) cache (
+      .clk(clk),
+      .rst(rst),
 
-  //     // wiring to BurstRAM (prefix br_)
-  //     .br_cmd(br_cmd),
-  //     .br_cmd_en(br_cmd_en),
-  //     .br_addr(br_addr),
-  //     .br_wr_data(br_wr_data),
-  //     .br_data_mask(br_data_mask),
-  //     .br_rd_data(br_rd_data),
-  //     .br_rd_data_valid(br_rd_data_valid),
-  //     .br_busy(br_busy)
-  // );
-
-  RAM #(
-      .ADDR_WIDTH(ADDR_WIDTH),
-      .DATA_FILE (DATA_FILE)
-  ) ram (
-      .clk  (clk),
-      .weA  (ram_weA),
-      .addrA(ram_addrA),
-      .dinA (ram_dinA),
+      // port A: data
+      .enA(ram_enA),
+      .weA(ram_weA),
+      .addrA(addrA),
+      .dinA(ram_dinA),
       .doutA(ram_doutA),
-      .addrB(addrB[ADDR_WIDTH+1:2]),
-      .doutB(doutB)
+      .validA(validA),
+      .bsyA(bsyA),
+
+      // port B: instructions
+      .addrB (addrB),
+      .doutB (doutB),
+      .validB(validB),
+      .bsyB  (bsyB),
+
+      // wiring to BurstRAM (prefix br_)
+      .br_cmd(br_cmd),
+      .br_cmd_en(br_cmd_en),
+      .br_addr(br_addr),
+      .br_wr_data(br_wr_data),
+      .br_data_mask(br_data_mask),
+      .br_rd_data(br_rd_data),
+      .br_rd_data_valid(br_rd_data_valid),
+      .br_busy(br_busy)
   );
 
   UartTx #(
@@ -129,66 +123,74 @@ module RAMIO #(
   );
 
   // RAM
-  reg [ADDR_WIDTH-1:0] ram_addrA;  // address of ram port A
-  reg [DATA_WIDTH-1:0] ram_dinA;  // data from ram port A
-  wire [DATA_WIDTH-1:0] ram_doutA;  // data to ram port A
+  reg [31:0] ram_dinA;  // data from ram port A
+  wire [31:0] ram_doutA;  // data to ram port A
+  reg ram_enA;
   reg [3:0] ram_weA;  // which bytes of the 'dinA' is written to ram port A
 
   // write
   reg [1:0] addr_lower_w;
   always @(*) begin
-    ram_addrA = addrA >> 2;
     addr_lower_w = addrA & 2'b11;
     ram_weA = 0;
     ram_dinA = 0;
-    case (weA)
-      2'b00: begin  // none
-        ram_weA = 4'b0000;
-      end
-      2'b01: begin  // byte
-        case (addr_lower_w)
-          2'b00: begin
-            ram_weA = 4'b0001;
-            ram_dinA[7:0] = dinA[7:0];
-          end
-          2'b01: begin
-            ram_weA = 4'b0010;
-            ram_dinA[15:8] = dinA[7:0];
-          end
-          2'b10: begin
-            ram_weA = 4'b0100;
-            ram_dinA[23:16] = dinA[7:0];
-          end
-          2'b11: begin
-            ram_weA = 4'b1000;
-            ram_dinA[31:24] = dinA[7:0];
-          end
-        endcase
-      end
-      2'b10: begin  // half word
-        case (addr_lower_w)
-          2'b00: begin
-            ram_weA = 4'b0011;
-            ram_dinA[15:0] = dinA[15:0];
-          end
-          2'b01: ;  // ? error
-          2'b10: begin
-            ram_weA = 4'b1100;
-            ram_dinA[31:16] = dinA[15:0];
-          end
-          2'b11: ;  // ? error
-        endcase
-      end
-      2'b11: begin  // word
-        // ? assert(addr_lower_w==0)
-        ram_weA  = 4'b1111;
-        ram_dinA = dinA;
-      end
-    endcase
+    ram_enA = 0;
+    if (!bsyA) begin
+      ram_enA = 1;
+      case (weA)
+        2'b00: begin  // none
+          ram_weA = 4'b0000;
+        end
+        2'b01: begin  // byte
+          case (addr_lower_w)
+            2'b00: begin
+              ram_weA = 4'b0001;
+              ram_dinA[7:0] = dinA[7:0];
+            end
+            2'b01: begin
+              ram_weA = 4'b0010;
+              ram_dinA[15:8] = dinA[7:0];
+            end
+            2'b10: begin
+              ram_weA = 4'b0100;
+              ram_dinA[23:16] = dinA[7:0];
+            end
+            2'b11: begin
+              ram_weA = 4'b1000;
+              ram_dinA[31:24] = dinA[7:0];
+            end
+          endcase
+        end
+        2'b10: begin  // half word
+          case (addr_lower_w)
+            2'b00: begin
+              ram_weA = 4'b0011;
+              ram_dinA[15:0] = dinA[15:0];
+            end
+            2'b01: ;  // ? error
+            2'b10: begin
+              ram_weA = 4'b1100;
+              ram_dinA[31:16] = dinA[15:0];
+            end
+            2'b11: ;  // ? error
+          endcase
+        end
+        2'b11: begin  // word
+          // ? assert(addr_lower_w==0)
+          ram_weA  = 4'b1111;
+          ram_dinA = dinA;
+        end
+      endcase
+
+`ifdef DBG
+      $display("ram_enA: %0d  weA: b%b  bsyA: %0d", ram_enA, weA, bsyA);
+`endif
+
+    end
   end
 
   // read
-  reg [ADDR_WIDTH+1:0] addrA_prev;  // address used in previous cycle
+  reg [31:0] addrA_prev;  // address used in previous cycle
   reg [2:0] reA_prev; // 'reA' from previous cycle used in this cycle (due to one cycle delay of data ready)
 
   // uarttx
@@ -212,41 +214,43 @@ module RAMIO #(
       // read unsigned byte from uart_rx
       doutA = {{24{1'b0}}, uartrx_data_read};
     end else begin
-      casex (reA_prev)  // read size
-        3'bx01: begin  // byte
-          case (addrA_prev[1:0])
-            2'b00: begin
-              doutA = reA[2] ? {{24{ram_doutA[7]}}, ram_doutA[7:0]} : {{24{1'b0}}, ram_doutA[7:0]};
-            end
-            2'b01: begin
-              doutA = reA[2] ? {{24{ram_doutA[15]}}, ram_doutA[15:8]} : {{24{1'b0}}, ram_doutA[15:8]};
-            end
-            2'b10: begin
-              doutA = reA[2] ? {{24{ram_doutA[23]}}, ram_doutA[23:16]} : {{24{1'b0}}, ram_doutA[23:16]};
-            end
-            2'b11: begin
-              doutA = reA[2] ? {{24{ram_doutA[31]}}, ram_doutA[31:24]} : {{24{1'b0}}, ram_doutA[31:24]};
-            end
-          endcase
-        end
-        3'bx10: begin  // half word
-          case (addrA_prev[1:0])
-            2'b00: begin
-              doutA = reA[2] ? {{16{ram_doutA[15]}}, ram_doutA[15:0]} : {{24{1'b0}}, ram_doutA[15:0]};
-            end
-            2'b01: doutA = 0;  // ? error
-            2'b10: begin
-              doutA = reA[2] ? {{16{ram_doutA[31]}}, ram_doutA[31:16]} : {{24{1'b0}}, ram_doutA[31:16]};
-            end
-            2'b11: doutA = 0;  // ? error
-          endcase
-        end
-        3'b111: begin  // word
-          // ? assert(addr_lower_w==0)
-          doutA = ram_doutA;
-        end
-        default: doutA = 0;
-      endcase
+      if (validA) begin
+        casex (reA_prev)  // read size
+          3'bx01: begin  // byte
+            case (addrA_prev[1:0])
+              2'b00: begin
+                doutA = reA[2] ? {{24{ram_doutA[7]}}, ram_doutA[7:0]} : {{24{1'b0}}, ram_doutA[7:0]};
+              end
+              2'b01: begin
+                doutA = reA[2] ? {{24{ram_doutA[15]}}, ram_doutA[15:8]} : {{24{1'b0}}, ram_doutA[15:8]};
+              end
+              2'b10: begin
+                doutA = reA[2] ? {{24{ram_doutA[23]}}, ram_doutA[23:16]} : {{24{1'b0}}, ram_doutA[23:16]};
+              end
+              2'b11: begin
+                doutA = reA[2] ? {{24{ram_doutA[31]}}, ram_doutA[31:24]} : {{24{1'b0}}, ram_doutA[31:24]};
+              end
+            endcase
+          end
+          3'bx10: begin  // half word
+            case (addrA_prev[1:0])
+              2'b00: begin
+                doutA = reA[2] ? {{16{ram_doutA[15]}}, ram_doutA[15:0]} : {{24{1'b0}}, ram_doutA[15:0]};
+              end
+              2'b01: doutA = 0;  // ? error
+              2'b10: begin
+                doutA = reA[2] ? {{16{ram_doutA[31]}}, ram_doutA[31:16]} : {{24{1'b0}}, ram_doutA[31:16]};
+              end
+              2'b11: doutA = 0;  // ? error
+            endcase
+          end
+          3'b111: begin  // word
+            // ? assert(addr_lower_w==0)
+            doutA = ram_doutA;
+          end
+          default: doutA = 0;
+        endcase
+      end
     end
   end
 
