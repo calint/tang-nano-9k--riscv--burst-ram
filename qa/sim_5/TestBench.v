@@ -61,7 +61,6 @@ module TestBench;
     #clk_tk;
     #clk_tk;
 
-    // check data ready
     if (rd_data_valid) $display("test 1 passed");
     else $display("test 1 FAILED");
 
@@ -89,7 +88,6 @@ module TestBench;
 
     #clk_tk;
 
-    // check data ready
     if (!rd_data_valid) $display("test 6 passed");
     else $display("test 6 FAILED");
 
@@ -112,7 +110,6 @@ module TestBench;
     #clk_tk;
     #clk_tk;
 
-    // check data ready
     if (rd_data_valid) $display("test 7 passed");
     else $display("test 7 FAILED");
 
@@ -140,7 +137,6 @@ module TestBench;
 
     #clk_tk;
 
-    // check data ready
     if (!rd_data_valid) $display("test 12 passed");
     else $display("test 12 FAILED");
 

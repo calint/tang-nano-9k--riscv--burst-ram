@@ -99,7 +99,7 @@ module TestBench;
     if (instruction == 32'hB7C6A980) $display("test 2 passed");
     else $display("test 2 FAILED");
 
-    // note: data may be ready before BurstRAM transaction is finished
+    // note: data may be valid before BurstRAM transaction is finished
     while (busy) #clk_tk;
 
     // cache hit

@@ -104,7 +104,7 @@ module TestBench;
     if (data == 32'hB7C6A980) $display("test 2 passed");
     else $display("test 2 FAILED");
 
-    // note: data may be ready before cache is finished retrieving data
+    // note: data may be valid before cache is finished retrieving data
     while (busy) #clk_tk;
 
     // cache hit

@@ -77,7 +77,7 @@ module RAMIO #(
   //     .doutA(ram_doutA),
   //     .addrB(addrB),
   //     .doutB(doutB),
-  //     .rdyB (rdyB),
+  //     .validB (validB),
   //     .bsyB (bsyB),
 
   //     // wiring to BurstRAM (prefix br_)

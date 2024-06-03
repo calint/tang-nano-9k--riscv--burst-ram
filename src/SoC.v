@@ -240,7 +240,7 @@ module SoC #(
     end else begin
       regs_we3 <= is_ld;  // if this is a 'load' from ram enable write to
                           // register 'ld_rd' during next cycle due to one
-                          // cycle delay for data ready from ram
+                          // cycle delay for data valid from ram
       ld_rd <= rd;  // save the destination register for next cycle write
       is_bubble <= bubble;  // if instruction generates bubble of next
                             // instruction (branch, jumps instructions)

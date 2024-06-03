@@ -394,7 +394,7 @@ module CacheData #(
 
         STATE_WRITE_FETCH_LINE: begin
           br_cmd_en <= 0;  // note: can turn of 'cmd' after one cycle
-          // wait for read to be ready
+          // wait for read to be valid
           if (br_rd_data_valid) begin
             update_cache_line_data;
             state <= STATE_WRITE_FETCH_RECV_DATA;
