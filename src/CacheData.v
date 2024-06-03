@@ -190,6 +190,8 @@ module CacheData #(
       data_out <= 0;
       br_cmd_en <= 0;
       br_cmd <= 0;
+      br_addr <= 0;
+      br_wr_data <= 0;
     end else begin
       case (state)
 
