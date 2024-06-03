@@ -3,7 +3,7 @@
 //
 
 `default_nettype none
-`define DBG
+// `define DBG
 // `define INFO
 
 module Cache #(

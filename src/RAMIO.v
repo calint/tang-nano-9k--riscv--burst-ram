@@ -3,7 +3,7 @@
 //
 
 `default_nettype none
-`define DBG
+// `define DBG
 
 module RAMIO #(
     parameter CLK_FREQ = 50_000_000,
