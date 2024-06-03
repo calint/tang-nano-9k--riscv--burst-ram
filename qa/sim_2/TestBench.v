@@ -153,33 +153,25 @@ module TestBench;
     if (doutA == 32'h78563412) $display("test 2 passed");
     else $display("test 2 FAILED");
 
-    $display("%h  %0d", doutA, bsyA);
-
-    #clk_ram_tk;
-    #clk_ram_tk;
-    #clk_ram_tk;
-    #clk_ram_tk;
-    #clk_ram_tk;
-    #clk_ram_tk;
-
-    $finish;
-
     // write half words
     reA   <= 0;
     weA   <= 2;
     dinA  <= 16'h1234;
     addrA <= 4;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     dinA  <= 16'h5678;
     addrA <= 6;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     // read word
     reA   <= 3'b111;
     weA   <= 0;
     addrA <= 4;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == 32'h56781234) $display("test 4 passed");
@@ -190,6 +182,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 0;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == 8'h12) $display("test 5 passed");
@@ -200,6 +193,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 1;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == 8'h34) $display("test 6 passed");
@@ -210,6 +204,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 2;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == 8'h56) $display("test 7 passed");
@@ -220,6 +215,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 3;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == 8'h78) $display("test 8 passed");
@@ -230,6 +226,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 4;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == 16'h1234) $display("test 9 passed");
@@ -240,6 +237,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 6;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == 16'h5678) $display("test 10 passed");
@@ -250,6 +248,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 4;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == 32'h56781234) $display("test 11 passed");
@@ -261,12 +260,14 @@ module TestBench;
     dinA  <= 32'hfffe_fdfc;
     addrA <= 8;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     // read signed byte
     reA   <= 3'b101;
     weA   <= 0;
     addrA <= 8;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == -4) $display("test 13 passed");
@@ -277,6 +278,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 9;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == -3) $display("test 14 passed");
@@ -287,6 +289,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 10;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == -2) $display("test 15 passed");
@@ -297,6 +300,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 11;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == -1) $display("test 16 passed");
@@ -307,6 +311,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 8;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == -516) $display("test 17 passed");
@@ -317,6 +322,7 @@ module TestBench;
     weA   <= 0;
     addrA <= 10;
     #clk_tk;
+    while (bsyA || bsyB) #clk_ram_tk;
 
     //    $display("%h",doutA);
     if (doutA == -2) $display("test 18 passed");

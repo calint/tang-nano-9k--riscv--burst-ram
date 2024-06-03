@@ -3,7 +3,7 @@
 //
 
 `default_nettype none
-`define DBG
+// `define DBG
 // `define INFO
 
 module CacheData #(
@@ -208,10 +208,11 @@ module CacheData #(
 
 `ifdef DBG
               $display("cache hit");
+              $display("write bytes: 0b%b", write_enable_bytes);
 `endif
 
               // write the data depending on which bytes are enabled
-              for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
+              for (integer i = 0; i < DATA_PER_LINE; i = i + 1) begin
                 if (write_enable_bytes[i]) begin
 
 `ifdef DBG
