@@ -10,7 +10,7 @@ TB=TestBench.v
 SRCPTH=../../src
 
 cd $SIMPTH
-pwd
+echo $SIMPTH
 
 # switch for system verilog
 # -g2005-sv 
