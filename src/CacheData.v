@@ -216,7 +216,7 @@ module CacheData #(
                 if (write_enable_bytes[i]) begin
 
 `ifdef DBG
-                  $display("change %0h, byte[%0d]=0x%0h", cache_line_data[line_ix][data_ix], i,
+                  $display("set %0h: byte[%0d]=0x%0h", cache_line_data[line_ix][data_ix], i,
                            data_in[(i+1)*8-1-:8]);
 `endif
 
