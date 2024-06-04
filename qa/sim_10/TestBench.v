@@ -117,6 +117,9 @@ module TestBench;
     #(clk_tk / 2);
     rst = 0;
 
+    // wait for initiation to complete
+    while (bsyA || bsyB) #clk_tk;
+
     addrB <= 4;
     #clk_tk;
 

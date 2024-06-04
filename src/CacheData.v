@@ -98,15 +98,16 @@ module CacheData #(
   // the upper bits of the address that is associated with a cache line
 
   // state machine
-  localparam STATE_IDLE = 7'b0000001;
-  localparam STATE_RECV_WAIT_FOR_DATA_VALID = 7'b000_0010;
-  localparam STATE_RECV_DATA = 7'b000_0100;
-  localparam STATE_WRITE_LINE = 7'b000_1000;
-  localparam STATE_WRITE_FETCH = 7'b001_0000;
-  localparam STATE_WRITE_FETCH_RECV_DATA = 7'b010_0000;
-  localparam STATE_WRITE_FETCH_LINE = 7'b100_0000;
+  localparam STATE_INITIATE = 8'b0000_0001;
+  localparam STATE_IDLE = 8'b0000_0010;
+  localparam STATE_RECV_WAIT_FOR_DATA_VALID = 8'b0000_0100;
+  localparam STATE_RECV_DATA = 8'b0000_1000;
+  localparam STATE_WRITE_LINE = 8'b0001_0000;
+  localparam STATE_WRITE_FETCH = 8'b0010_0000;
+  localparam STATE_WRITE_FETCH_RECV_DATA = 8'b0100_0000;
+  localparam STATE_WRITE_FETCH_LINE = 8'b1000_0000;
 
-  reg [6:0] state;
+  reg [7:0] state;
 
   //
   // cache data storage
@@ -177,8 +178,6 @@ module CacheData #(
 
   always @(posedge clk) begin
     if (rst) begin
-      state <= STATE_IDLE;
-      busy <= 0;
       data_out_valid <= 0;
       stat_cache_hits <= 0;
       stat_cache_misses <= 0;
@@ -189,8 +188,17 @@ module CacheData #(
       br_cmd <= 0;
       br_addr <= 0;
       br_wr_data <= 0;
+      busy <= 1;
+      state <= STATE_INITIATE;
     end else begin
       case (state)
+
+        STATE_INITIATE: begin
+          if (!br_busy) begin
+            busy  <= 0;
+            state <= STATE_IDLE;
+          end
+        end
 
         STATE_IDLE: begin
           // data_out_valid <= 0;

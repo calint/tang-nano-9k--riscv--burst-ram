@@ -93,11 +93,12 @@ module CacheInstructions #(
 
 
   // state machine
-  localparam STATE_IDLE = 3'b001;
-  localparam STATE_RECV_WAIT_FOR_DATA_VALID = 3'b010;
-  localparam STATE_RECV_DATA = 3'b100;
+  localparam STATE_INITIATE = 4'b0001;
+  localparam STATE_IDLE = 4'b0010;
+  localparam STATE_RECV_WAIT_FOR_DATA_VALID = 4'b0100;
+  localparam STATE_RECV_DATA = 4'b1000;
 
-  reg [2:0] state;
+  reg [3:0] state;
 
   //
   // cache data storage
@@ -164,8 +165,6 @@ module CacheInstructions #(
 
   always @(posedge clk) begin
     if (rst) begin
-      state <= STATE_IDLE;
-      busy <= 0;
       data_valid <= 0;
       stat_cache_hits <= 0;
       stat_cache_misses <= 0;
@@ -175,9 +174,19 @@ module CacheInstructions #(
       br_cmd <= 0;
       br_cmd_en <= 0;
       br_addr <= 0;
+      busy <= 1;
+      state <= STATE_INITIATE;
     end else begin
 
       case (state)
+
+        STATE_INITIATE: begin
+          if (!br_busy) begin
+            busy  <= 0;
+            state <= STATE_IDLE;
+          end
+        end
+
         STATE_IDLE: begin
           // data_valid <= 0;
           if (enable) begin

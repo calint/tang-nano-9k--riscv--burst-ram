@@ -1,6 +1,7 @@
+[x] BurstRAM: init delay emulation
 [ ] SoC: stall when port A or port B is busy
 [ ] Cache: handle if enable and busy
-[x] Cache: if port A gets enabled pause port B
+[ ] SoC: Cache enA and enB always high
 [ ] Cache: study the possibility of 'always @(*)' of CacheData and CacheInstruction
     to optimize one cycle delay when switching between caches to BurstRAM
     'etc/archived-files/always-star'
@@ -42,6 +43,7 @@
 [ ] similar sample os but in C++23
 [ ] switch to system verilog?
 --------------------------------------------------------------------------
+[x] Cache: if port A gets enabled pause port B
 [x] ICache: how to consolidate the duplicate code in state IDLE and RECV
     using: task
 [x] BurstRAM sim_7 vs sim_9 regarding read delay

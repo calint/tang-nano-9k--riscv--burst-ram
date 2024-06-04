@@ -8,11 +8,12 @@
 // `define INFO
 
 module BurstRAM #(
-    parameter DEPTH_BITWIDTH = 4,  // 2^4 * 8B entries
-    parameter DATA_FILE = "",
-    parameter CYCLES_BEFORE_DATA_VALID = 8,
-    parameter BURST_COUNT = 4,
-    parameter DATA_BITWIDTH = 64  // must be divisible by 8
+    parameter DEPTH_BITWIDTH = 4,  // 2 ^ 4 * 8 B entries
+    parameter DATA_FILE = "",  // initial RAM content
+    parameter CYCLES_BEFORE_DATA_VALID = 8,  // emulates read delay
+    parameter BURST_COUNT = 4,  // number of RAM data sizes transfered per burst
+    parameter DATA_BITWIDTH = 64,  // must be divisible by 8
+    parameter CYCLES_BEFORE_INITIATED = 10  // emulates initiation delay
 ) (
     input wire clk,
     input wire rst,
@@ -30,18 +31,25 @@ module BurstRAM #(
   localparam CMD_READ = 0;
   localparam CMD_WRITE = 1;
 
+  reg [$clog2(CYCLES_BEFORE_INITIATED):0] init_calib_delay_counter;
+  // note: not -1 because it comparison is against CYCLES_BEFORE_INITIATED
+
   reg [DATA_BITWIDTH-1:0] data[DEPTH-1:0];
+
   reg [$clog2(BURST_COUNT)-1:0] burst_counter;
+
   reg [$clog2(CYCLES_BEFORE_DATA_VALID):0] read_delay_counter;
-  // note: not -1 because it should delay the number of cycles
+  // note: not -1 because it comparison is against CYCLES_BEFORE_DATA_VALID
+
   reg [DEPTH-1:0] addr_counter;
 
-  localparam STATE_IDLE = 3'b000;
-  localparam STATE_READ_DELAY = 3'b001;
-  localparam STATE_READ_BURST = 3'b010;
-  localparam STATE_WRITE_BURST = 3'b100;
+  localparam STATE_INITIATE = 5'b00001;
+  localparam STATE_IDLE = 5'b00010;
+  localparam STATE_READ_DELAY = 5'b00100;
+  localparam STATE_READ_BURST = 5'b01000;
+  localparam STATE_WRITE_BURST = 5'b10000;
 
-  reg [2:0] state;
+  reg [4:0] state;
 
   initial begin
 
@@ -65,10 +73,19 @@ module BurstRAM #(
     if (rst) begin
       rd_data_valid <= 0;
       rd_data <= 0;
-      busy <= 0;
-      state <= STATE_IDLE;
+      busy <= 1;
+      init_calib_delay_counter <= 0;
+      state <= STATE_INITIATE;
     end else begin
       case (state)
+
+        STATE_INITIATE: begin
+          if (init_calib_delay_counter == CYCLES_BEFORE_INITIATED) begin
+            busy  <= 0;
+            state <= STATE_IDLE;
+          end
+          init_calib_delay_counter <= init_calib_delay_counter + 1;
+        end
 
         STATE_IDLE: begin
           if (cmd_en) begin

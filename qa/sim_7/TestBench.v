@@ -47,6 +47,9 @@ module TestBench;
     #(clk_tk / 2);
     rst = 0;
 
+    // wait for initiation to complete
+    while (busy) #clk_tk;
+
     // write to 0x0000
     cmd_en <= 1;
     cmd <= 1; // write

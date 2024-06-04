@@ -85,6 +85,9 @@ module TestBench;
     #(clk_tk / 2);
     rst = 0;
 
+    // wait for initiation to complete
+    while (busy) #clk_tk;
+
     // cache miss
     address <= 0;
     enable  <= 1;
