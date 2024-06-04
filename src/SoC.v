@@ -20,7 +20,7 @@ module SoC #(
     output wire uart_tx,
     input wire btn,
     output reg initiated,
-    output reg stalled,
+    output reg is_stalled,
 
     // wiring to BurstRAM (prefix br_)
     output wire br_cmd,
@@ -82,6 +82,8 @@ module SoC #(
   reg bubble;  // signals that next instruction is a bubble
   reg is_bubble;  // signals that current instruction is a bubble
 
+  reg stalled;
+
   localparam STATE_INITIATE = 2'b01;
   localparam STATE_RUN = 2'b10;
 
@@ -100,12 +102,13 @@ module SoC #(
     rs2_dat = 0;
     stalled = ram_bsyA || ram_bsyB;
 
-    if (!stalled) begin
+    if (!is_stalled && initiated) begin
       pc_nxt = pc + 4;
+    end else begin
+      pc_nxt = pc;
     end
 
-    if (stalled) begin
-    end else if (!is_bubble) begin
+    if (!is_bubble && !is_stalled && initiated) begin
       // if last instruction was a load to a register and the same register
       // is used in this instruction then use the output of ram since it is
       // not in the register yet 
@@ -278,6 +281,7 @@ module SoC #(
       is_bubble <= 0;
       initiated <= 0;
       ir <= 0;
+      is_stalled <= 0;
       state <= STATE_INITIATE;
     end else begin
       case (state)
@@ -286,7 +290,6 @@ module SoC #(
             initiated <= 1;
             ram_enA <= 1;
             ram_enB <= 1;
-            stalled <= 0;
             state <= STATE_RUN;
           end
         end
@@ -299,10 +302,13 @@ module SoC #(
           ld_rd <= rd;  // save the destination register for next cycle write
           is_bubble <= bubble;  // if instruction generates bubble of next
                                 // instruction (branch, jumps instructions)
-          pc <= pc_nxt;
-          pc_ir <= pc_nxt - 4;  // -4 because 'pc' is the next instruction to be
-                                // fetched. when branching there is a bubble and
-                                // 'pc' is incremented by 4 during that
+          is_stalled <= stalled;
+          if (!stalled) begin
+            pc <= pc_nxt;
+            pc_ir <= pc_nxt - 4;  // -4 because 'pc' is the next instruction to be
+                                  // fetched. when branching there is a bubble and
+                                  // 'pc' is incremented by 4 during that
+          end
         end
       endcase
     end

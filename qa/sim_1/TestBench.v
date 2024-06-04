@@ -48,7 +48,7 @@ module TestBench;
       .uart_tx(uart_tx),
       .btn(btn),
       .initiated(initiated),
-      .stalled(stalled),
+      .is_stalled(stalled),
 
       // wiring to BurstRAM (prefix br_)
       .br_cmd(br_cmd),
@@ -141,100 +141,140 @@ module TestBench;
     if (dut.regs.mem[12] == 32'h1) $display("test 7 passed");
     else $display("test 7 FAILED");
 
+    while(stalled) #clk_tk;
+
     // 20: fff64693 xori x13,x12,-1
     #clk_tk;
     if (dut.regs.mem[13] == 32'hffff_fffe) $display("test 8 passed");
     else $display("test 8 FAILED");
+
+    while(stalled) #clk_tk;
 
     // 24: 0016e693 ori x13,x13,1
     #clk_tk;
     if (dut.regs.mem[13] == 32'hffff_ffff) $display("test 9 passed");
     else $display("test 9 FAILED");
 
+    while(stalled) #clk_tk;
+
     // 28: 0026f693 andi x13,x13,2
     #clk_tk;
     if (dut.regs.mem[13] == 32'h2) $display("test 10 passed");
     else $display("test 10 FAILED");
+
+    while(stalled) #clk_tk;
 
     // 2c: 00369693 slli x13,x13,0x3
     #clk_tk;
     if (dut.regs.mem[13] == 16) $display("test 11 passed");
     else $display("test 11 FAILED");
 
+    while(stalled) #clk_tk;
+
     // 30: 0036d693 srli x13,x13,0x3
     #clk_tk;
     if (dut.regs.mem[13] == 2) $display("test 12 passed");
     else $display("test 12 FAILED");
+
+    while(stalled) #clk_tk;
 
     // 34: fff6c693 xori x13,x13,-1
     #clk_tk;
     if (dut.regs.mem[13] == -3) $display("test 13 passed");
     else $display("test 13 FAILED");
 
+    while(stalled) #clk_tk;
+
     // 38: 4016d693 srai x13,x13,0x1
     #clk_tk;
     if (dut.regs.mem[13] == -2) $display("test 14 passed");
     else $display("test 14 FAILED");
+
+    while(stalled) #clk_tk;
 
     // 3c: 00c68733 add x14,x13,x12
     #clk_tk;
     if (dut.regs.mem[14] == -1) $display("test 15 passed");
     else $display("test 15 FAILED");
 
+    while(stalled) #clk_tk;
+
     // 40: 40c70733 sub x14,x14,x12
     #clk_tk;
     if (dut.regs.mem[14] == -2) $display("test 16 passed");
     else $display("test 16 FAILED");
+
+    while(stalled) #clk_tk;
 
     // 44: 00c617b3 sll x15,x12,x12
     #clk_tk;
     if (dut.regs.mem[15] == 2) $display("test 17 passed");
     else $display("test 17 FAILED");
 
+    while(stalled) #clk_tk;
+
     // 48: 00f62833 slt x16,x12,x15
     #clk_tk;
     if (dut.regs.mem[16] == 1) $display("test 18 passed");
     else $display("test 18 FAILED");
+
+    while(stalled) #clk_tk;
 
     // 4c: 00c62833 slt x16,x12,x12
     #clk_tk;
     if (dut.regs.mem[16] == 0) $display("test 19 passed");
     else $display("test 19 FAILED");
 
+    while(stalled) #clk_tk;
+
     // 50: 00d83833 sltu x16,x16,x13
     #clk_tk;
     if (dut.regs.mem[16] == 1) $display("test 20 passed");
     else $display("test 20 FAILED");
+
+    while(stalled) #clk_tk;
 
     // 54: 00d84833 xor x17,x16,x13
     #clk_tk;
     if (dut.regs.mem[17] == -1) $display("test 21 passed");
     else $display("test 21 FAILED");
 
+    while(stalled) #clk_tk;
+
     // 58: 0105d933 srl x18,x11,x16
     #clk_tk;
     if (dut.regs.mem[18] == 1) $display("test 22 passed");
     else $display("test 22 FAILED");
+
+    while(stalled) #clk_tk;
 
     // 5c: 4108d933 sra x18,x17,x16
     #clk_tk;
     if (dut.regs.mem[18] == -1) $display("test 23 passed");
     else $display("test 23 FAILED");
 
+    while(stalled) #clk_tk;
+
     // 60: 00b869b3 or x19,x16,x11
     #clk_tk;
     if (dut.regs.mem[19] == 3) $display("test 24 passed");
     else $display("test 24 FAILED");
+
+    while(stalled) #clk_tk;
 
     // 64: 0109f9b3 and x19,x19,x16
     #clk_tk;
     if (dut.regs.mem[19] == 1) $display("test 25 passed");
     else $display("test 25 FAILED");
 
+    while(stalled) #clk_tk;
+    
     // 68: 00001a37 lui x20,0x1
     #clk_tk;
     if (dut.regs.mem[20] == 32'h0000_1000) $display("test 26 passed");
     else $display("test 26 FAILED");
+
+    while(stalled) #clk_tk;
 
     // 6c: 013a2223 sw x19,4(x20) # 1004
     #clk_tk;
@@ -250,6 +290,8 @@ module TestBench;
     #clk_tk;
     // if (dut.ram.ram.data[32'h0000_1004>>2] == 32'h0101_0001) $display("test 29 passed");
     // else $display("test 29 FAILED");
+
+    $finish;
 
     // 78: 004a0a83 lb x21,4(x20)
     #clk_tk;  // x21 write is in the next cycle

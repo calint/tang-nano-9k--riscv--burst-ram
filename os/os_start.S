@@ -1,5 +1,5 @@
 # generated - do not edit
 .global _start
 _start:
-    li sp, 0xfffc
+    li sp, 0x3ffc
     jal ra, run
