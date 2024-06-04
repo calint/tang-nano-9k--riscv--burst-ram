@@ -21,7 +21,8 @@
 set -e
 
 PATH=$PATH:~/riscv/install/rv32i/bin
-BIN=os
+FILE_NAME=$1
+BIN=${FILE_NAME%.*}
 
 riscv32-unknown-elf-gcc \
 	-O0 \
@@ -40,16 +41,14 @@ riscv32-unknown-elf-gcc \
 	-Wshadow \
 	-Wl,-Ttext=0x0 \
 	-Wl,--no-relax \
-	os_start.S os.c -o $BIN
-
-#	-Wpadded \
+	$1 -o $BIN
 
 riscv32-unknown-elf-objcopy $BIN -O binary $BIN.bin
 
 chmod -x $BIN.bin
 
-#riscv32-unknown-elf-objdump -Mnumeric,no-aliases --source-comment -Sr $BIN > $BIN.lst
-riscv32-unknown-elf-objdump --source-comment -Sr $BIN > $BIN.lst
+riscv32-unknown-elf-objdump -Mnumeric,no-aliases --source-comment -Sr $BIN > $BIN.lst
+#riscv32-unknown-elf-objdump --source-comment -Sr $BIN > $BIN.lst
 
 # print 8 bytes at a time as hex in little endian mode
 xxd -c 8 -g 8 -e $BIN.bin | awk '{print $2}' > $BIN.mem

@@ -7,6 +7,7 @@
     to optimize one cycle delay when switching between caches to BurstRAM
     the 1 cycle delay is the switch from STATE_IDLE
     'etc/archived-files/always-star'
+    another way is to signal when data is starting to be received and calculate cycles
 [ ] ICache, DCache: busy->idle state switch skipped if new command?
     if busy 0 can be predicted then a cycle can be saved by sending new command
     before entering 'idle' state

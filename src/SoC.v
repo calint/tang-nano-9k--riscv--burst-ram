@@ -19,6 +19,8 @@ module SoC #(
     input wire uart_rx,
     output wire uart_tx,
     input wire btn,
+    output reg initiated,
+    output reg stalled,
 
     // wiring to BurstRAM (prefix br_)
     output wire br_cmd,
@@ -35,7 +37,8 @@ module SoC #(
   reg [31:0] pc_nxt;  // next value of program counter
   reg [31:0] pc_ir;  // program counter of current instruction
 
-  wire [31:0] ir;  // instruction register (one cycle delay due to ram access)
+  wire [31:0] ram_doutB;
+  reg [31:0] ir;  // instruction register (one cycle delay due to ram access)
   wire [6:0] opcode = ir[6:0];
   wire [4:0] rd = ir[11:7];  // destination register
   wire [2:0] funct3 = ir[14:12];
@@ -79,6 +82,11 @@ module SoC #(
   reg bubble;  // signals that next instruction is a bubble
   reg is_bubble;  // signals that current instruction is a bubble
 
+  localparam STATE_INITIATE = 2'b01;
+  localparam STATE_RUN = 2'b10;
+
+  reg [1:0] state;
+
   always @(*) begin
     regs_rd_we = 0;
     regs_rd_wd = 0;
@@ -90,9 +98,14 @@ module SoC #(
     bubble = 0;
     rs1_dat = 0;
     rs2_dat = 0;
-    pc_nxt = pc + 4;
+    stalled = ram_bsyA || ram_bsyB;
 
-    if (!is_bubble) begin
+    if (!stalled) begin
+      pc_nxt = pc + 4;
+    end
+
+    if (stalled) begin
+    end else if (!is_bubble) begin
       // if last instruction was a load to a register and the same register
       // is used in this instruction then use the output of ram since it is
       // not in the register yet 
@@ -263,17 +276,35 @@ module SoC #(
       pc <= 0;
       pc_ir <= 0;
       is_bubble <= 0;
+      initiated <= 0;
+      ir <= 0;
+      state <= STATE_INITIATE;
     end else begin
-      regs_we3 <= is_ld;  // if this is a 'load' from ram enable write to
-                          // register 'ld_rd' during next cycle due to one
-                          // cycle delay for data valid from ram
-      ld_rd <= rd;  // save the destination register for next cycle write
-      is_bubble <= bubble;  // if instruction generates bubble of next
-                            // instruction (branch, jumps instructions)
-      pc <= pc_nxt;
-      pc_ir <= pc_nxt - 4;  // -4 because 'pc' is the next instruction to be
-                            // fetched. when branching there is a bubble and
-                            // 'pc' is incremented by 4 during that
+      case (state)
+        STATE_INITIATE: begin
+          if (!ram_bsyA && !ram_bsyB) begin
+            initiated <= 1;
+            ram_enA <= 1;
+            ram_enB <= 1;
+            stalled <= 0;
+            state <= STATE_RUN;
+          end
+        end
+        STATE_RUN: begin
+          ir <= ram_doutB;
+
+          regs_we3 <= is_ld;  // if this is a 'load' from ram enable write to
+                              // register 'ld_rd' during next cycle due to one
+                              // cycle delay for data valid from ram
+          ld_rd <= rd;  // save the destination register for next cycle write
+          is_bubble <= bubble;  // if instruction generates bubble of next
+                                // instruction (branch, jumps instructions)
+          pc <= pc_nxt;
+          pc_ir <= pc_nxt - 4;  // -4 because 'pc' is the next instruction to be
+                                // fetched. when branching there is a bubble and
+                                // 'pc' is incremented by 4 during that
+        end
+      endcase
     end
   end
 
@@ -297,8 +328,8 @@ module SoC #(
 
       // RAM and cache
       .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
-      .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT),
       .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH),
+      .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT),
       .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH)
   ) ram (
       .rst(rst),
@@ -317,7 +348,7 @@ module SoC #(
       // port B: instruction memory, byte addressed, bottom 2 bits ignored, word aligned
       .enB(ram_enB),  // enables port B
       .addrB(pc),  // program counter
-      .doutB(ir),  // instruction register
+      .doutB(ram_doutB),  // instruction register
       .validB(ram_validB),  // when asserted doutB is valid
       .bsyB(ram_bsyB),  // when asserted port B is busy
 

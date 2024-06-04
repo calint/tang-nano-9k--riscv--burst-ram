@@ -11,11 +11,11 @@ module TestBench;
 
   BurstRAM #(
       .DATA_FILE("RAM.mem"),
-      .CYCLES_BEFORE_INITIATED(10),
-      .CYCLES_BEFORE_DATA_VALID(6),
-      .DATA_BITWIDTH(RAM_DATA_BITWIDTH),
       .DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
-      .BURST_COUNT(RAM_BURST_COUNT)
+      .DATA_BITWIDTH(RAM_DATA_BITWIDTH),
+      .BURST_COUNT(RAM_BURST_COUNT),
+      .CYCLES_BEFORE_INITIATED(10),
+      .CYCLES_BEFORE_DATA_VALID(3)
   ) burst_ram (
       .clk(clk_ram),
       .rst(rst),
@@ -36,8 +36,8 @@ module TestBench;
 
       // RAM and cache
       .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
-      .RAM_BURST_DATA_COUNT(RAM_BURST_COUNT),
       .RAM_BURST_DATA_BITWIDTH(RAM_DATA_BITWIDTH),
+      .RAM_BURST_DATA_COUNT(RAM_BURST_COUNT),
       .CACHE_LINE_IX_BITWIDTH(1)
   ) dut (
       .rst(rst),
@@ -47,6 +47,8 @@ module TestBench;
       .uart_rx(uart_rx),
       .uart_tx(uart_tx),
       .btn(btn),
+      .initiated(initiated),
+      .stalled(stalled),
 
       // wiring to BurstRAM (prefix br_)
       .br_cmd(br_cmd),
@@ -74,8 +76,10 @@ module TestBench;
   wire uart_rx;
   wire uart_tx;
   wire btn;
+  wire initiated;
+  wire stalled;
 
-  localparam clk_tk = 10;
+  localparam clk_tk = 8;
   reg clk = 0;
   always #(clk_tk / 2) clk = ~clk;
 
@@ -94,10 +98,10 @@ module TestBench;
     #clk_tk;
     rst = 0;
 
+    while (!initiated) #clk_tk;
+
     // start pipeline
     #clk_tk;
-
-    //    $display("*** start ***");
 
     // 0: 00000013 addi x0,x0,0
     #clk_tk;
