@@ -8,7 +8,7 @@
 module RAMIO #(
     parameter CLK_FREQ = 50_000_000,
     parameter BAUD_RATE = 9600,
-    parameter TOP_ADDR = {32{1'b1}},
+    parameter TOP_ADDR = {32{1'b1}},  // last byte in address space
     parameter ADDR_LEDS = TOP_ADDR,  // address of leds, 7 bits, rgb 4:6 enabled is off
     parameter ADDR_UART_OUT = TOP_ADDR - 1,  // send byte address
     parameter ADDR_UART_IN = TOP_ADDR - 2,  // received byte address, must be read with 'lbu'
