@@ -31,7 +31,7 @@ module Top (
       .CYCLES_BEFORE_INITIATED(10),
       .CYCLES_BEFORE_DATA_VALID(3)
   ) burst_ram (
-      .clk(soc_clk),
+      .clk(sys_clk),
       .rst(!sys_rst_n),
 
       .cmd(br_cmd),
@@ -56,7 +56,7 @@ module Top (
   ) soc (
       .rst(sys_rst_n),
       .clk(soc_clk),
-      .clk_ram(soc_clk),
+      .clk_ram(sys_clk),
       .led(led),
       .uart_rx(uart_rx),
       .uart_tx(uart_tx),

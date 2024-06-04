@@ -68,8 +68,6 @@ module Cache #(
       .br_addr(icache_br_addr),
       .br_rd_data(br_rd_data),
       .br_rd_data_valid(br_rd_data_valid),
-      .br_wr_data(icache_br_wr_data),
-      .br_data_mask(icache_br_data_mask),
       .br_busy(br_busy)
   );
 

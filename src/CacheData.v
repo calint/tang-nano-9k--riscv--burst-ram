@@ -189,6 +189,7 @@ module CacheData #(
       br_cmd <= 0;
       br_addr <= 0;
       br_wr_data <= 0;
+      br_data_mask <= 0;
       busy <= 1;
       state <= STATE_INITIATE;
     end else begin
@@ -433,7 +434,7 @@ module CacheData #(
               cache_line_dirty[line_ix] <= 1;
             end
 
-            busy <= 0;
+            busy  <= 0;
             state <= STATE_IDLE;
           end
         end
