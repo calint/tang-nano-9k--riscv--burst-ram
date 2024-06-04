@@ -20,7 +20,7 @@ module RAMIO #(
     parameter CACHE_LINE_IX_BITWIDTH = 1
 ) (
     input wire rst,
-    input wire clk,
+    input wire clk_cpu,
     input wire clk_ram,
 
     // port A: data memory, read / write byte addressable ram
@@ -67,7 +67,7 @@ module RAMIO #(
       .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
       .CACHE_ADDRESS_LEADING_ZEROS_BITWIDTH(2)
   ) cache (
-      .clk(clk),
+      .clk(clk_ram),
       .rst(rst),
 
       // port A: data
@@ -101,7 +101,7 @@ module RAMIO #(
       .BAUD_RATE(BAUD_RATE)
   ) uarttx (
       .rst(rst),
-      .clk(clk),
+      .clk(clk_cpu),
       .data(uarttx_data),  // data to send
       .go(uarttx_go),  // enable to start transmission, disable after 'data' has been read
       .tx(uart_tx),  // uart tx wire
@@ -113,7 +113,7 @@ module RAMIO #(
       .BAUD_RATE(BAUD_RATE)
   ) uartrx (
       .rst(rst),
-      .clk(clk),
+      .clk(clk_cpu),
       .rx(uart_rx),  // uart rx wire
       .go(uartrx_go),  // enable to start receiving, disable to acknowledge 'dr'
       .data(uartrx_data),  // current data being received, is incomplete until 'dr' is enabled
@@ -254,7 +254,7 @@ module RAMIO #(
     end
   end
 
-  always @(posedge clk) begin
+  always @(posedge clk_cpu) begin
     if (rst) begin
       leds <= 6'b11_1111;  // turn off all leds
       uarttx_data <= 0;

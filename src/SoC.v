@@ -13,7 +13,7 @@ module SoC #(
     parameter CACHE_IX_IN_LINE_BITWIDTH = 3
 ) (
     input wire rst,
-    input wire clk,
+    input wire clk_cpu,
     input wire clk_ram,
     output wire [5:0] led,
     input wire uart_rx,
@@ -274,7 +274,7 @@ module SoC #(
     end
   end
 
-  always @(posedge clk) begin
+  always @(posedge clk_cpu) begin
     if (rst) begin
       pc <= 0;
       pc_ir <= 0;
@@ -315,7 +315,7 @@ module SoC #(
   end
 
   Registers regs (
-      .clk(clk),
+      .clk(clk_cpu),
       .rs1(rs1),  // register source 1
       .rs2(rs2),  // register source 2
       .rd(rd),  // destination register
@@ -339,7 +339,8 @@ module SoC #(
       .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH)
   ) ram (
       .rst(rst),
-      .clk(clk_ram),
+      .clk_cpu(clk_cpu),
+      .clk_ram(clk_ram),
 
       // port A: data memory, read / write byte addressable ram
       .enA(ram_enA),  // enables port A

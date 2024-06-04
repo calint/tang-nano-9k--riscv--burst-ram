@@ -38,7 +38,8 @@ module TestBench;
       .CACHE_LINE_IX_BITWIDTH(1)
   ) dut (
       .rst(rst),
-      .clk(clk_ram),
+      .clk_cpu(clk),
+      .clk_ram(clk_ram),
 
       .enA(enA),
       .weA(weA),

@@ -41,7 +41,7 @@ module TestBench;
       .CACHE_LINE_IX_BITWIDTH(1)
   ) dut (
       .rst(rst),
-      .clk(clk),
+      .clk_cpu(clk),
       .clk_ram(clk_ram),
       .led(led),
       .uart_rx(uart_rx),
