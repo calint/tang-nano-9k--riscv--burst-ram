@@ -1,3 +1,4 @@
+[ ] SoC: stall when port A or port B is busy
 [x] Cache: if port A gets enabled pause port B
 [ ] Cache: study the possibility of 'always @(*)' of CacheData and CacheInstruction
     to optimize one cycle delay when switching between caches to BurstRAM
