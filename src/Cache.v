@@ -70,6 +70,7 @@ module Cache #(
       .br_addr(icache_br_addr),
       .br_rd_data(br_rd_data),
       .br_rd_data_valid(br_rd_data_valid),
+      .br_wr_data(icache_br_wr_data),
       .br_busy(br_busy)
   );
 
@@ -88,7 +89,6 @@ module Cache #(
       .rst(rst),
       .enable(dcache_enable),
       .write_enable_bytes(weA),
-      .command(dcache_command),
       .address(addrA),
       .data_in(dinA),
       .data_out(doutA),
@@ -107,19 +107,15 @@ module Cache #(
   );
 
   // port B to BurstRAM wires
+  reg icache_enable;
   wire icache_br_cmd;
   wire icache_br_cmd_en;
   wire [RAM_DEPTH_BITWIDTH-1:0] icache_br_addr;
-  wire [RAM_BURST_DATA_BITWIDTH-1:0] icache_br_wr_data;
-  wire [RAM_BURST_DATA_BITWIDTH/8-1:0] icache_br_data_mask;
+  wire [RAM_BURST_DATA_BITWIDTH-1:0] icache_br_wr_data = 0;
+  wire [RAM_BURST_DATA_BITWIDTH/8-1:0] icache_br_data_mask = 0;
 
-  // port A to CacheData
-  wire dcache_command;
-
-  reg icache_enable;
+  // port A to BurstRAM wires
   reg dcache_enable;
-
-  // 
   wire dcache_br_cmd;
   wire dcache_br_cmd_en;
   wire [RAM_DEPTH_BITWIDTH-1:0] dcache_br_addr;

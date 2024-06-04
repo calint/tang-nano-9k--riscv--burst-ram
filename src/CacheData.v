@@ -44,9 +44,6 @@ module CacheData #(
     input wire enable,
     // assert to request data, busy must not be asserted or the signal is ignored
 
-    input wire command,
-    // if enable asserted then 0 for read and 1 for write
-
     input wire [ADDRESS_BITWIDTH-1:0] address,
     // address in bytes, 4 byte words aligned with bottom 2 bits being 0
 
@@ -467,25 +464,6 @@ module CacheData #(
 
     end
   endtask
-
-  //   task read_fetched_data_into_cache_line;
-  //     begin
-  //       for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
-
-  // `ifdef DBG
-  //         $display("cache[%0d][%0d]=%h", line_ix, burst_data_ix + i,
-  //                  br_rd_data[(i+1)*DATA_BITWIDTH-1-:DATA_BITWIDTH]);
-  // `endif
-
-  //         // set first cached element in line data
-  //         cache_line_data[line_ix][burst_data_ix + i] 
-  //           <= br_rd_data[(i+1)*DATA_BITWIDTH-1-:DATA_BITWIDTH];
-  //       end
-
-  //       burst_data_ix <= burst_data_ix + DATA_PER_RAM_DATA;
-  //       burst_counter <= burst_counter + 1;
-  //     end
-  //   endtask
 
 endmodule
 

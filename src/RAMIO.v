@@ -250,14 +250,14 @@ module RAMIO #(
           end
           default: doutA = 0;
         endcase
+      end else begin  // not (validA)
+        doutA = 0;
       end
     end
   end
 
   always @(posedge clk) begin
     if (rst) begin
-      ram_dinA <= 0;
-      ram_weA <= 0;
       leds <= 6'b11_1111;  // turn off all leds
       uarttx_data <= 0;
       uarttx_go <= 0;
