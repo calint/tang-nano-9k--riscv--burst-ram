@@ -13,10 +13,11 @@ module TestBench;
 
   BurstRAM #(
       .DATA_FILE("RAM.mem"),
-      .DATA_BITWIDTH(RAM_DATA_BITWIDTH),
       .DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
+      .DATA_BITWIDTH(RAM_DATA_BITWIDTH),
+      .BURST_COUNT(RAM_BURST_COUNT),
       .CYCLES_BEFORE_DATA_VALID(3),
-      .BURST_COUNT(RAM_BURST_COUNT)
+      .CYCLES_BEFORE_INITIATED(10)
   ) burst_ram (
       .clk(clk_ram),
       .rst(rst),
@@ -43,18 +44,18 @@ module TestBench;
       .clk(clk_ram),
       .rst(rst),
 
-      .enA  (enA),
-      .weA  (weA),
+      .enA(enA),
+      .weA(weA),
       .addrA(addrA),
-      .dinA (dinA),
+      .dinA(dinA),
       .doutA(doutA),
-      .validA (validA),
-      .bsyA (bsyA),
+      .validA(validA),
+      .bsyA(bsyA),
 
-      .addrB(addrB),
-      .doutB(doutB),
-      .validB (validB),
-      .bsyB (bsyB),
+      .addrB (addrB),
+      .doutB (doutB),
+      .validB(validB),
+      .bsyB  (bsyB),
 
       // wiring to BurstRAM (prefix br_)
       .br_cmd(br_cmd),

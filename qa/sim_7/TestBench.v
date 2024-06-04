@@ -7,9 +7,11 @@
 module TestBench;
   BurstRAM #(
       .DATA_FILE(""),
-      .CYCLES_BEFORE_DATA_VALID(4),
+      .DEPTH_BITWIDTH(4),
+      .DATA_BITWIDTH(64),
       .BURST_COUNT(4),
-      .DEPTH_BITWIDTH(4)
+      .CYCLES_BEFORE_INITIATED(10),
+      .CYCLES_BEFORE_DATA_VALID(4)
   ) dut (
       .clk(clk),
       .rst(rst),
@@ -52,12 +54,12 @@ module TestBench;
 
     // write to 0x0000
     cmd_en <= 1;
-    cmd <= 1; // write
+    cmd <= 1;  // write
     addr <= 0;
     wr_data <= 64'h3F5A2E14B7C6A980;
     #clk_tk;
-    cmd_en <= 0; // note: can be disabled
-    cmd <= 0; // note: can be disabled
+    cmd_en <= 0;  // note: can be disabled
+    cmd <= 0;  // note: can be disabled
     wr_data <= 64'h9D8E2F17AB4C3E6F;
     #clk_tk;
     wr_data <= 64'hA1C3F7E2D5B8A9C4;
@@ -75,12 +77,12 @@ module TestBench;
 
     // write to 0x0020
     cmd_en <= 1;
-    cmd <= 1; // write
-    addr <= 32 / 8; // 8 bytes words
+    cmd <= 1;  // write
+    addr <= 32 / 8;  // 8 bytes words
     wr_data <= 64'h6C4B9A8D2F5E3C7A;
     #clk_tk;
-    cmd_en <= 0; // note: can be disabled
-    cmd <= 0; // note: can be disabled
+    cmd_en <= 0;  // note: can be disabled
+    cmd <= 0;  // note: can be disabled
     wr_data <= 64'hE1A7D0B5C8F3E6A9;
     #clk_tk;
     wr_data <= 64'hF8E9D2C3B4A5F6E7;
@@ -90,12 +92,12 @@ module TestBench;
 
     // write to 0x0000
     cmd_en <= 1;
-    cmd <= 1; // write
+    cmd <= 1;  // write
     addr <= 0;
     wr_data <= 64'h3F5A2E14B7C6A980;
     #clk_tk;
-    cmd_en <= 0; // note: can be disabled
-    cmd <= 0; // note: can be disabled
+    cmd_en <= 0;  // note: can be disabled
+    cmd <= 0;  // note: can be disabled
     wr_data <= 64'h9D8E2F17AB4C3E6F;
     #clk_tk;
     wr_data <= 64'hA1C3F7E2D5B8A9C4;
@@ -108,8 +110,8 @@ module TestBench;
     cmd <= 0;
     addr <= 0;
     #clk_tk;
-    cmd_en <= 0; // note: can be disable
-    cmd <= 0; // note: can be disabled
+    cmd_en <= 0;  // note: can be disable
+    cmd <= 0;  // note: can be disabled
     #clk_tk;
 
     // delay before burst (DELAY_BEFORE_RD_DATA_AVAILABLE)
@@ -153,8 +155,8 @@ module TestBench;
     cmd <= 0;
     addr <= 32 / 8;  // 8 bytes words
     #clk_tk;
-    cmd_en <= 0; // note: can be disable
-    cmd <= 0; // note: can be disabled
+    cmd_en <= 0;  // note: can be disable
+    cmd <= 0;  // note: can be disabled
     #clk_tk;
 
     // delay before burst (DELAY_BEFORE_RD_DATA_AVAILABLE)
@@ -193,8 +195,8 @@ module TestBench;
     cmd <= 0;
     addr <= 0;
     #clk_tk;
-    cmd_en <= 0; // note: can be disable
-    cmd <= 0; // note: can be disabled
+    cmd_en <= 0;  // note: can be disable
+    cmd <= 0;  // note: can be disabled
     #clk_tk;
 
     // delay before burst (DELAY_BEFORE_RD_DATA_AVAILABLE)
