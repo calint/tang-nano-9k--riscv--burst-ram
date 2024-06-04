@@ -1,3 +1,7 @@
+[ ] sim_2
+[ ] sim_1
+[ ] sim_3
+[ ] sim_4
 [x] BurstRAM: init delay emulation
 [x] CacheX: CACHE_IX_IN_LINE_BITWIDTH calculated from RAM_BURST_DATA_BITWIDTH and RAM_BURST_DATA_COUNT
 [ ] SoC: stall when port A or port B is busy

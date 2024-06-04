@@ -10,7 +10,6 @@
         <File path="src/CacheData.v" type="file.verilog" enable="1"/>
         <File path="src/CacheInstructions.v" type="file.verilog" enable="1"/>
         <File path="src/Configuration.v" type="file.verilog" enable="1"/>
-        <File path="src/RAM.v" type="file.verilog" enable="1"/>
         <File path="src/RAMIO.v" type="file.verilog" enable="1"/>
         <File path="src/Registers.v" type="file.verilog" enable="1"/>
         <File path="src/SoC.v" type="file.verilog" enable="1"/>

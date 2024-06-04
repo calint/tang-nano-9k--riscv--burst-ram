@@ -55,7 +55,7 @@ module Top (
       .CACHE_LINE_IX_BITWIDTH(1)
   ) soc (
       .rst(sys_rst_n),
-      .clk(soc_clk),
+      .clk_cpu(soc_clk),
       .clk_ram(sys_clk),
       .led(led),
       .uart_rx(uart_rx),

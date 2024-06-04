@@ -79,7 +79,7 @@ module TestBench;
   // --
 
   // cpu clock
-  localparam clk_tk = 10;
+  localparam clk_tk = 20;
   reg clk = 0;
   always #(clk_tk / 2) clk = ~clk;
 

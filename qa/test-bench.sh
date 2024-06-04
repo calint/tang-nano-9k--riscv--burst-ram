@@ -21,7 +21,6 @@ iverilog -Winfloop -pfileline=1 -o iverilog.vvp \
     $SRCPTH/CacheInstructions.v \
     $SRCPTH/CacheData.v \
     $SRCPTH/Cache.v \
-    $SRCPTH/RAM.v \
     $SRCPTH/UartTx.v \
     $SRCPTH/UartRx.v \
     $SRCPTH/RAMIO.v \
