@@ -1,6 +1,7 @@
 //
 // data cache connected to BurstRAM
 //
+// reviewed: 2024-06-04
 
 `default_nettype none
 // `define DBG
@@ -11,50 +12,52 @@ module CacheData #(
     // address space assumed 32 bit
 
     parameter DATA_BITWIDTH = 32,
-    // size of a data element stored in cache line, must be divisible by 8
+    // size of a data element stored in cache line; must be divisible by 8
 
     parameter RAM_DEPTH_BITWIDTH = 8,
     // size of RAM: 2 ^ RAM_DEPTH_BITWIDTH * RAM_BURST_DATA_BITWIDTH / 8 = 2 KB
 
     parameter RAM_BURST_DATA_BITWIDTH = 64,
     // size of data sent by RAM in bits, must be divisible by 8 into bytes
-    // note: the burst size and cache line size must match
-    //       a burst reads or writes one cache line thus
+    // note: the burst size and cache line size must match because
+    //       a burst reads or writes one cache line
 
     parameter RAM_BURST_DATA_COUNT = 4,
     // consecutive data elements retrieved in a burst
 
     parameter LINE_IX_BITWIDTH = 1,
     // 2 ^ 1 = 2 cache lines
+    // 64 bits * 4  (RAM_BURST_DATA_BITWIDTH * RAM_BURST_DATA_COUNT)
 
     parameter ADDRESS_LEADING_ZEROS_BITWIDTH = 2
     // data accessed have leading 2 zeros; 4 bytes aligned, e.g. 0xabcdef00
 ) (
-    input wire clk,  // RAM clock
+    input wire clk,  // clock
 
     input wire rst,  // reset
 
     input wire enable,
-    // assert to request data, busy must not be asserted or the signal is ignored
+    // assert to request data; busy must not be asserted or the signal is ignored
 
     input wire [ADDRESS_BITWIDTH-1:0] address,
-    // address in bytes, 4 byte words aligned with bottom 2 bits being 0
+    // address in bytes; 4 byte words aligned with bottom 2 bits being 0
 
     output reg [DATA_BITWIDTH-1:0] data_out,
     // the cached data of the address
 
     output reg data_out_valid,
-    // data retrieved and valid
+    // asserted when data retrieved and valid
 
     output reg busy,
     // asserted while busy
-    // note: data_out_valid may be asserted while busy is asserted
-    //       if burst ram transaction not complete
-
-    input wire [DATA_BITWIDTH/8-1:0] write_enable_bytes,
+    // note: 'data_out_valid' may be asserted while 'busy' is asserted if burst 
+    //       ram transaction not complete
 
     input wire [DATA_BITWIDTH-1:0] data_in,
     // data to be written
+
+    input wire [DATA_BITWIDTH/8-1:0] write_enable_bytes,
+    // bit map for which bytes to be written from 'data_in'
 
     // -- wiring to BurstRAM (prefix br_) -- -- -- -- -- --
     output reg br_cmd,
@@ -120,7 +123,7 @@ module CacheData #(
   // the upper bits of the address compared with the request to evict and load a new cache line
 
   reg [DATA_BITWIDTH-1:0] cache_line_data[LINE_COUNT-1:0][DATA_PER_LINE-1:0];
-  // the cached instructions
+  // the cached data
 
   reg [$clog2(RAM_BURST_DATA_COUNT)-1:0] burst_counter;
   // counter of data packets retrieved in burst
@@ -344,9 +347,7 @@ module CacheData #(
           if (burst_counter == RAM_BURST_DATA_COUNT - 1) begin
             // -1 because of the non-blocking assignments are updated at
             // the end of the always block
-            busy <= 0;
-            burst_counter <= 0;
-            burst_data_ix <= 0;
+            busy  <= 0;
             state <= STATE_IDLE;
           end
         end
@@ -356,8 +357,6 @@ module CacheData #(
           if (burst_counter == RAM_BURST_DATA_COUNT - 1) begin
             // -1 because of the non-blocking assignments are updated at
             // the end of the always block
-            burst_counter <= 0;
-            burst_data_ix <= 0;
 
             // after write back is done read the line and then set the data
             br_addr <= {
@@ -379,8 +378,11 @@ module CacheData #(
                 {address[ADDRESS_BITWIDTH-1-:(TAG_BITWIDTH+LINE_IX_BITWIDTH)], {DATA_IX_IN_LINE_BITWIDTH{1'b0}}, {ADDRESS_LEADING_ZEROS_BITWIDTH{1'b0}}} >> BYTE_ADDRESS_SHIFT_RIGHT_TO_RAM_ADDRESS);
 `endif
 
+            burst_counter <= 0;
+            burst_data_ix <= 0;
+
             state <= STATE_WRITE_FETCH_LINE;
-          end else begin
+          end else begin  // not (burst_counter == RAM_BURST_DATA_COUNT - 1)
             // write next data from cache line
             for (integer i = 0; i < DATA_PER_RAM_DATA; i = i + 1) begin
               br_wr_data[(i+1)*DATA_BITWIDTH-1 -:DATA_BITWIDTH] 
@@ -432,8 +434,6 @@ module CacheData #(
             end
 
             busy <= 0;
-            burst_counter <= 0;
-            burst_data_ix <= 0;
             state <= STATE_IDLE;
           end
         end
