@@ -13,29 +13,22 @@ module CacheData #(
     parameter DATA_BITWIDTH = 32,
     // size of a data element stored in cache line, must be divisible by 8
 
-    parameter DATA_IX_IN_LINE_BITWIDTH = 3,
-    // 2 ^ 3 = 8 data per cache line
-
-    parameter LINE_IX_BITWIDTH = 1,
-    // 2 ^ 1 = 2 cache lines
-
-    parameter ADDRESS_LEADING_ZEROS_BITWIDTH = 2,
-    // data accessed have leading 2 zeros; 4 bytes aligned, e.g. 0xabcdef00
-
-    parameter RAM_BURST_DATA_COUNT = 4,
-    // consecutive data elements retrieved in a burst
+    parameter RAM_DEPTH_BITWIDTH = 8,
+    // size of RAM: 2 ^ RAM_DEPTH_BITWIDTH * RAM_BURST_DATA_BITWIDTH / 8 = 2 KB
 
     parameter RAM_BURST_DATA_BITWIDTH = 64,
     // size of data sent by RAM in bits, must be divisible by 8 into bytes
     // note: the burst size and cache line size must match
-    //       a burst reads or writes one cache line thus:
-    //       RAM_BURST_DATA_COUNT * RAM_BURST_DATA_BITWIDTH = 
-    //       2 ^ DATA_IX_IN_LINE_BITWIDTH * DATA_BITWIDTH =
-    //       32 B
-    // RAM reads 4 * 8 = 32 B per burst
+    //       a burst reads or writes one cache line thus
 
-    parameter RAM_DEPTH_BITWIDTH = 8
-    // size of RAM: 2 ^ RAM_DEPTH_BITWIDTH * RAM_BURST_DATA_BITWIDTH / 8 = 2 KB
+    parameter RAM_BURST_DATA_COUNT = 4,
+    // consecutive data elements retrieved in a burst
+
+    parameter LINE_IX_BITWIDTH = 1,
+    // 2 ^ 1 = 2 cache lines
+
+    parameter ADDRESS_LEADING_ZEROS_BITWIDTH = 2
+    // data accessed have leading 2 zeros; 4 bytes aligned, e.g. 0xabcdef00
 ) (
     input wire clk,  // RAM clock
 
@@ -74,6 +67,11 @@ module CacheData #(
     input wire br_busy
     // -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 );
+
+  localparam DATA_IX_IN_LINE_BITWIDTH = $clog2(
+      RAM_BURST_DATA_BITWIDTH * RAM_BURST_DATA_COUNT / DATA_BITWIDTH
+  );
+  // bits used to index a data in a cache line
 
   localparam DATA_SIZE_BYTES = DATA_BITWIDTH / 8;
 

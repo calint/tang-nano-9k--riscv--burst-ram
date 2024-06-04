@@ -14,11 +14,10 @@ module RAMIO #(
     parameter ADDR_UART_IN = TOP_ADDR - 2,  // received byte address, must be read with 'lbu'
 
     // RAM and cache
-    parameter CACHE_LINE_IX_BITWIDTH = 1,
-    parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
     parameter RAM_DEPTH_BITWIDTH = 8,
     parameter RAM_BURST_DATA_COUNT = 4,
-    parameter RAM_BURST_DATA_BITWIDTH = 64
+    parameter RAM_BURST_DATA_BITWIDTH = 64,
+    parameter CACHE_LINE_IX_BITWIDTH = 1
 ) (
     input wire rst,
     input wire clk,
@@ -62,12 +61,11 @@ module RAMIO #(
   Cache #(
       .ADDRESS_BITWIDTH(32),
       .DATA_BITWIDTH(32),
-      .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
-      .CACHE_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),
-      .CACHE_ADDRESS_LEADING_ZEROS_BITWIDTH(2),
       .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
       .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT),
-      .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH)
+      .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH),
+      .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
+      .CACHE_ADDRESS_LEADING_ZEROS_BITWIDTH(2)
   ) cache (
       .clk(clk),
       .rst(rst),

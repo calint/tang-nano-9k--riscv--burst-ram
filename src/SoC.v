@@ -6,11 +6,11 @@ module SoC #(
     parameter BAUD_RATE = 9600,
 
     // RAM and cache
-    parameter CACHE_LINE_IX_BITWIDTH = 1,
-    parameter CACHE_IX_IN_LINE_BITWIDTH = 3,
     parameter RAM_DEPTH_BITWIDTH = 8,
+    parameter RAM_BURST_DATA_BITWIDTH = 64,
     parameter RAM_BURST_DATA_COUNT = 4,
-    parameter RAM_BURST_DATA_BITWIDTH = 64
+    parameter CACHE_LINE_IX_BITWIDTH = 1,
+    parameter CACHE_IX_IN_LINE_BITWIDTH = 3
 ) (
     input wire rst,
     input wire clk,
@@ -296,11 +296,10 @@ module SoC #(
       .BAUD_RATE(BAUD_RATE),
 
       // RAM and cache
-      .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH),
-      .CACHE_IX_IN_LINE_BITWIDTH(CACHE_IX_IN_LINE_BITWIDTH),
       .RAM_DEPTH_BITWIDTH(RAM_DEPTH_BITWIDTH),
       .RAM_BURST_DATA_COUNT(RAM_BURST_DATA_COUNT),
-      .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH)
+      .RAM_BURST_DATA_BITWIDTH(RAM_BURST_DATA_BITWIDTH),
+      .CACHE_LINE_IX_BITWIDTH(CACHE_LINE_IX_BITWIDTH)
   ) ram (
       .rst(rst),
       .clk(clk_ram),

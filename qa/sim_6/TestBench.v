@@ -26,15 +26,12 @@ module TestBench;
   );
 
   CacheInstructions #(
-      .LINE_IX_BITWIDTH(1),  // 2^1 cache lines
       .ADDRESS_BITWIDTH(32),
       .DATA_BITWIDTH(32),  // 4 B per instruction
-      .DATA_IX_IN_LINE_BITWIDTH(3),  // 2^3 32 bit instructions per cache line (32B)
       .RAM_DEPTH_BITWIDTH(4),
       .RAM_BURST_DATA_BITWIDTH(64),
-      .RAM_BURST_DATA_COUNT(4)  // 4 * 64 bits = 32B
-      // note: size of INSTRUCTION_IX_IN_LINE_BITWIDTH and RAM_READ_BURST_COUNT must
-      //       result in same number of bytes because a cache line is loaded by the size of a burst
+      .RAM_BURST_DATA_COUNT(4),  // 4 * 64 bits = 32B
+      .LINE_IX_BITWIDTH(1)  // 2^1 cache lines
   ) dut (
       .clk(clk),
       .rst(rst),
@@ -170,7 +167,7 @@ module TestBench;
     enable <= 0;
 
     #clk_tk;
-    
+
     while (!data_valid) #clk_tk;
 
     if (dut.stat_cache_misses == 3) $display("test 12 passed");

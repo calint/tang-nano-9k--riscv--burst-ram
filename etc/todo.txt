@@ -1,4 +1,5 @@
 [x] BurstRAM: init delay emulation
+[x] CacheX: CACHE_IX_IN_LINE_BITWIDTH calculated from RAM_BURST_DATA_BITWIDTH and RAM_BURST_DATA_COUNT
 [ ] SoC: stall when port A or port B is busy
 [ ] Cache: handle if enable and busy
 [ ] SoC: Cache enA and enB always high
