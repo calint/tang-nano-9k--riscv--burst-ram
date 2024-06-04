@@ -212,7 +212,7 @@ module CacheData #(
 `endif
 
               // write the data depending on which bytes are enabled
-              for (integer i = 0; i < DATA_PER_LINE; i = i + 1) begin
+              for (integer i = 0; i < DATA_BITWIDTH / 8; i = i + 1) begin
                 if (write_enable_bytes[i]) begin
 
 `ifdef DBG
